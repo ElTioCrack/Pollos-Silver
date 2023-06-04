@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../../style/css/gp/style.css">
+    <title>Adminsitracion de Productos</title>
+    <script type="module" src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@5.5.2/dist/ionicons/ionicons.js"></script>
+</head>
+
+<body>
+    <div class="container-AdminProducts">
+        <div class="AP-title">
+            <h2>ADMINISTRACION DE PRODUCTOS</h2>
+        </div>
+        <div class="AP-principalView">
+            <!-- CONTENEDOR LISTA DE PRODUCTOS -->
+            <div class="AP-listProducts">
+                <div class="AP-box">
+                    <h3>LISTA DE PRODUCTOS</h3>
+                    <form class="form">
+                        <label for="search">
+                            <input name="search" id="search" required="" type="text" placeholder="Buscar un Producto"
+                                autocomplete="off">
+                            <div class="icon">
+                                <svg stroke-width="2" stroke="currentColor" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" class="swap-on">
+                                    <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" stroke-linejoin="round"
+                                        stroke-linecap="round"></path>
+                                </svg>
+                                <svg stroke-width="2" stroke="currentColor" viewBox="0 0 24 24" fill="none"
+                                    xmlns="http://www.w3.org/2000/svg" class="swap-off">
+                                    <path d="M10 19l-7-7m0 0l7-7m-7 7h18" stroke-linejoin="round"
+                                        stroke-linecap="round"></path>
+                                </svg>
+                            </div>
+                            <button type="reset" class="close-btn">
+                                <svg viewBox="0 0 20 20" class="h-5 w-5" xmlns="http://www.w3.org/2000/svg">
+                                    <path clip-rule="evenodd"
+                                        d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                                        fill-rule="evenodd"></path>
+                                </svg>
+                            </button>
+                        </label>
+                    </form>
+                    <div class="AP-productsContainer" id="productsContainerList">
+                        <!-- AQUI VA LA LISTA DE PRODUCTOS -->
+                    </div>
+                </div>
+                <h2 style="margin-top:15px;">DISPONIBLE / NO DISPONIBLE</h2>
+                <div class="AP-categories">
+                    <div class="AP-categories-food">
+                        <ion-icon name="eye"></ion-icon>
+                    </div>
+                    <div class="AP-checkbox-wrapper-26">
+                        <input type="checkbox" id="productStateView">
+                    </div>
+                    <div class="AP-categories-food">
+                        <ion-icon name="trash"></ion-icon>
+                    </div>
+                </div>
+            </div>
+            <div class="AP-viewProducts">
+                <form class="formCreatProduct" id="createProduct" enctype="multipart/form-data">
+                    <div class="Ap-course2" id="contenidoDinamico">
+                        <div class="AP-preview2" id="viewCrear">
+                            <input type="hidden" id="productId">
+                            <div class="AP-image">
+                                <div class="boddy">
+                                    <div class="drag-area" id="dragA">
+                                        <header>Arrastra tu</header>
+                                        <span>imagen</span>
+                                        <input type="file" name="archivo" hidden id="productImage">
+                                    </div>
+                                    <p id="filenameP"></p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="AP-info2">
+                            <div class="AP-titleForm">
+                                <input type="text" placeholder="NOMBRE DEL PRODUCTO" id="productName" maxlength="20"
+                                    required>
+                            </div>
+                            <div class="AP-progress-wrapper">
+                                <div>
+                                    <input type="text" placeholder="Precio (Max 100Bs.)" class="precio"
+                                        id="productPrice" required>
+                                </div>
+                            </div>
+                            <div class="AP-p-trunc">
+                                <textarea cols="30" rows="5" placeholder="Descripccion del producto Max. Caracteres 126"
+                                    id="productDescription"></textarea>
+                            </div>
+                        </div>
+                        <div class="AP-switchesProduct">
+                            <h4>CATEGORIA</h4>
+                            <div class="AP-categories">
+                                <div class="AP-categories-food">
+                                    <ion-icon name="restaurant"></ion-icon>
+                                </div>
+                                <div class="AP-checkbox-wrapper-25">
+                                    <input type="checkbox" id="productCategory">
+                                </div>
+                                <div class="AP-categories-food">
+                                    <ion-icon name="pint"></ion-icon>
+                                </div>
+                            </div>
+                            <h4>ESTADO</h4>
+                            <div class="AP-categories">
+                                <div class="AP-categories-food">
+                                    <ion-icon name="eye"></ion-icon>
+                                </div>
+                                <div class="AP-checkbox-wrapper-26">
+                                    <input type="checkbox" id="productState">
+                                </div>
+                                <div class="AP-categories-food">
+                                    <ion-icon name="trash"></ion-icon>
+                                </div>
+                            </div>
+                        </div>
+                        <button class="continue-application" type="submit">
+                            <div>
+                                <div class="pencil"></div>
+                                <div class="folder">
+                                    <div class="top">
+                                        <svg viewBox="0 0 24 27">
+                                            <path
+                                                d="M1,0 L23,0 C23.5522847,-1.01453063e-16 24,0.44771525 24,1 L24,8.17157288 C24,8.70200585 23.7892863,9.21071368 23.4142136,9.58578644 L20.5857864,12.4142136 C20.2107137,12.7892863 20,13.2979941 20,13.8284271 L20,26 C20,26.5522847 19.5522847,27 19,27 L1,27 C0.44771525,27 6.76353751e-17,26.5522847 0,26 L0,1 C-6.76353751e-17,0.44771525 0.44771525,1.01453063e-16 1,0 Z">
+                                            </path>
+                                        </svg>
+                                    </div>
+                                    <div class="paper"></div>
+                                </div>
+                            </div>
+                            <h3>Guardar Producto</h3>
+                        </button>
+                    </div>
+                </form>
+                <div class="AP-containerButtons">
+                    <button class="button" id="crear">
+                        <svg viewBox="0 0 448 512" class="svgIcon">
+                            <path
+                                d="M416 224H272V80c0-13.3-10.7-24-24-24h-48c-13.3 0-24 10.7-24 24v144H32c-17.7 0-32 14.3-32 32v48c0 17.7 14.3 32 32 32h144v144c0 17.7 14.3 32 32 32h48c17.7 0 32-14.3 32-32V336h144c17.7 0 32-14.3 32-32v-48c0-17.7-14.3-32-32-32z" />
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="../../js/gp/main.js"></script>
+    <script src="../../js/gp/script.js"></script>
+    <script src="../../js/gp/validations.js"></script>
+</body>
+
+</html>

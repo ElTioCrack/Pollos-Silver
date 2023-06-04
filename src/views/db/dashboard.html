@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>dashboard</title>
+
+    <link rel="stylesheet" href="../../style/css/db/db.css">
+    <script src="https://kit.fontawesome.com/bbb62af81d.js" crossorigin="anonymous"></script>
+
+    <!-- ----------------------------------------------------------------------- -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+
+    <script type="text/javascript" src="../../js/gu/logout.js"></script>
+    <script type="text/javascript" src="../../js/gu/session_data.js"></script>
+    <script type="text/javascript">
+        var nombres
+        var apellidos
+        var tipo_usuario
+
+        window.onload = function () {
+            session_data()
+                .then(function (response) {
+                    // usuario logueado?
+                    if (response.length === 0)
+                        window.location.href = "../../views/gu/login.html"
+                    else
+                        init(response)
+                })
+                .catch(function (error) { console.log(error) });
+        };
+
+        function init(response) {
+            // Para poner el nombre de usuario
+            nombres = response.nombres
+            apellidos = response.apellidos
+            $(".user-name").text(nombres + " " + apellidos)
+            
+            $("#main").load("../ge/empleados.html");
+
+            // Aside
+            $("#btn-inicio").click(function () {
+                $("#main").text("AAA");
+            })
+            $("#btn-clientes").click(function () {
+                $("#main").load("../gc/clientes.html");
+            })
+            $("#btn-empleados").click(function () {
+                $("#main").load("../ge/empleados.html");
+            })
+            $("#btn-productos").click(function () {
+                $("#main").load("../gp/ap.html");
+            })
+            $("#btn-sucursales").click(function () {
+                $("#main").load("../gs/index.html");
+            })
+            $("#btn-informes").click(function () {
+                $("#main").load("../gs/index.php");
+            })
+
+            // Detecciones de tipos de usuarios
+            tipo_usuario = response.usuario.tipousuario.tipo
+            switch (tipo_usuario) {
+                case "Jefe":
+                    break;
+
+                case "Empleado":
+                    $("#btn-productos").hide();
+                    $("#btn-sucursales").hide();
+                    $("#btn-informes").hide();
+                    break;
+            }
+        }
+    </script>
+</head>
+
+<body>
+    <header>
+        <div class="header-left">
+            <div class="ico-aside">
+                <i id="sidebar-toggle" class="fa-solid fa-bars"></i>
+            </div>
+            <div class="title">Pollos Silver</div>
+        </div>
+        <div class="user">
+            <div class="user-name">Nombre del Usuario</div>
+            <button class="log-out-button">Cerrar Sesión</button>
+        </div>
+    </header>
+
+    <aside class="sidebar">
+        <div class="sidebar-content">
+            <div class="sidebar-button" id="btn-inicio">
+                <div class="ico-aside">
+                    <i class="fa-solid fa-house"></i>
+                </div>
+                <span class="sidebar-text">Inicio</span>
+            </div>
+
+            <div class="sidebar-button" id="btn-clientes">
+                <div class="ico-aside">
+                    <i class="fa-solid fa-user"></i>
+                </div>
+                <span class="sidebar-text">Clientes</span>
+            </div>
+
+            <div class="sidebar-button" id="btn-empleados">
+                <div class="ico-aside">
+                    <i class="fa-solid fa-address-card"></i>
+                </div>
+                <span class="sidebar-text">Empleados</span>
+            </div>
+
+            <div class="sidebar-button" id="btn-productos">
+                <div class="ico-aside">
+                    <i class="fa-solid fa-bag-shopping"></i>
+                </div>
+                <span class="sidebar-text">Productos</span>
+            </div>
+
+            <div class="sidebar-button" id="btn-sucursales">
+                <div class="ico-aside">
+                    <i class="fa-solid fa-shop"></i>
+                </div>
+                <span class="sidebar-text">Sucursales</span>
+            </div>
+
+            <div class="sidebar-button" id="btn-informes">
+                <div class="ico-aside">
+                    <i class="fa-solid fa-file"></i>
+                </div>
+                <span class="sidebar-text">Informes y reportes</span>
+            </div>
+        </div>
+    </aside>
+
+    <main id="main">
+        <!-- Contenido principal del panel de control -->
+        <h2>En obras, digo en codificacion</h2>
+        <h2>no mentira xd</h2>
+        <h2>ya pensaremos que poner aca para que no este en white digo en blanco</h2>
+        <h2>jajaxdsalu2</h2>
+    </main>
+
+    <!-- <footer>
+        <div class="footer-bg">
+            <div class="footer-content">
+                <div class="footer-title">Desarrollado por:</div>
+                <ul class="footer-list">
+                    <li class="footer-item">Jasmin Cabrera Aspiazu</li>
+                    <li class="footer-item">Ilian Felipez Vaca</li>
+                    <li class="footer-item">Miguel Mollericona Cuentas</li>
+                    <li class="footer-item">Marcelo Nina Calsina</li>
+                    <li class="footer-item">Royer Ticona Chipana</li>
+                </ul>
+            </div>
+            <div class="footer-content">
+                <div class="footer-title">Puedes contactarnos en:</div>
+                <ul class="footer-list">
+                    <li class="footer-item">+591 71900198</li>
+                    <li class="footer-item">pedidosya.com.bo</li>
+                </ul>
+            </div>
+            <div class="footer-content">
+                <div class="footer-title">Horario de atención:</div>
+                <ul class="footer-list">
+                    <li class="footer-item">Lunes - Sábado</li>
+                    <li class="footer-item">13:00 PM - 23:00 PM</li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-custom">
+            <div>UNIVALLE © 2023</div>
+        </div>
+    </footer> -->
+</body>
+
+<script>
+    // Para el side bar
+    $(document).ready(function () {
+        $('#sidebar-toggle').click(function () {
+            $('.sidebar').toggleClass('open');
+        });
+    });
+</script>
+
+<script type="text/javascript">
+    // Para Cerrar Sesion
+    $(document).ready(function () {
+        let btn_log_out = $(".log-out-button")
+        btn_log_out.click(function () {
+            logout()
+        })
+        btn_log_out.css("cursor", "pointer")
+    })
+</script>
+
+<script type="text/javascript">
+    // Para activar y desactivar botones del aside
+    // $(document).ready(function () {
+    //     // Botones de la barra lateral
+    //     var $sidebarButtons = $('.sidebar-button');
+
+    //     $sidebarButtons.on('click', function () {
+    //         // Desactivar todos los botones
+    //         $sidebarButtons.removeClass('active');
+
+    //         // Activar el botón seleccionado
+    //         $(this).addClass('active');
+    //     });
+    // });
+</script>
+
+</html>

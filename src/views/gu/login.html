@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <link rel="stylesheet" href="../../style/css/gu/login.css">
+    <!-- ----------------------------------------------------------------------- -->
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/jquery/2.2.2/jquery.min.js'></script>
+    <script type="text/javascript" src="../../js/gu/verify_session.js"></script>
+    <script type="text/javascript">
+        $(document).ready(function() {
+            verify_session()
+                .then(function (response) {
+                    if (Array.isArray(response) && response.length === 0) {
+                        // Sale de la función y evita que se ejecute el código restante
+                        return;
+                    }
+                    window.location.href = "../db/dashboard.html";
+                })
+                .catch(function (error) {
+                    // Manejar el error en caso de que ocurra
+                    console.log("🚀 ~ file: login.html:29 ~ error:", error);
+                });
+        });
+    </script>
+    <!-- ----------------------------------------------------------------------- -->
+    <link rel='stylesheet' href='https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.6.3/css/font-awesome.css'>
+</head>
+
+<body>
+    <div id="loader">
+        <div id="status"></div>
+    </div>
+    <main>
+        <section>
+            <div class="card">
+                <article>
+                    <h1>¡Bienvenido!</h1>
+                </article>
+                <article>
+                    <p>
+                        <span>¡Solo Personal autorizado!</span>
+                    </p>
+                    <form method="post" autocomplete="">
+
+                        <label class="inputBox" for="ci">
+                            <input type="text" id="ci" required></input>
+                            <label for="ci">Carnet de Identidad</label>
+                            <i class="fa fa-envelope" aria-hidden="true"></i>
+                        </label>
+
+                        <label class="inputBox" for="password">
+                            <input type="password" id="password"></input>
+                            <label for="password">Contraseña</label>
+                            <i class="fa fa-lock" aria-hidden="true"></i>
+                        </label>
+
+                        <div class="message" style="color: red;">
+                            <p>Carnet de Identidad o contraseña Incorrecta</p>
+                        </div>
+
+                        <button id="button" type="submit">Iniciar Sesión</button>
+                    </form>
+                </article>
+            </div>
+        </section>
+        <section>
+            <article>
+                <div class="img">
+                    <img src="../../img/logo.png">
+                </div>
+            </article>
+        </section>
+    </main>
+</body>
+
+<!-- ----------------------------------------------------------------------- -->
+<script>
+    $(document).ready(function () {
+        $(".inputBox input").keyup(function () {
+            if ($(this).val().length > 0) {
+                $(this).closest(".inputBox input").addClass("filled")
+            } else {
+                $(this).closest(".inputBox input").removeClass("filled")
+            }
+        })
+    })
+</script>
+<script src="../../js/gu/login_empleado.js"></script>
+<!-- ----------------------------------------------------------------------- -->
+
+</html>

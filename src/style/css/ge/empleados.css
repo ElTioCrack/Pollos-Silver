@@ -1,0 +1,458 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@500&display=swap');
+
+:root {
+    --color-background: #f5ebdc;
+    --color-card-clear: #efe0cc;
+    --color-card-dark: #8b451b;
+    --color-card-important: #d92000;
+    --color-text: #eeeeee;
+    --color-text-important: #ff8801;
+    --color-options: #ffaa00;
+    --color-black: #000;
+    --text-size: 2.5vh;
+    --size-border-radius: 25px;
+    --switch-size: 50px;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    
+}
+
+/* -------------------------------------------------------------------------- */
+h2,
+h3 {
+    text-align: center;
+}
+
+h2 {
+    font-size: 1.75em;
+}
+
+i {
+    color: var(--color-black);
+}
+
+/* -------------------------------------------------------------------------- */
+/* body {
+    background: var(--color-background);
+    min-height: 100vh;
+    min-width: 100vw;
+} */
+
+.main {
+    max-width: 1200px;
+    display: grid;
+    grid-gap: 1em;
+    grid-template-columns: repeat(2, 1fr);
+    justify-items: stretch;
+    margin: 0 auto;
+}
+
+section {
+    padding: 0.25em 0.5em;
+    background: var(--color-card-clear);
+    border-radius: var(--size-border-radius);
+}
+
+article {
+    padding: 0.125em 0.25em;
+}
+
+section:nth-child(1) {
+    grid-column: span 2;
+}
+
+/* section:nth-child(2) section:nth-child(3) {
+    max-width: 50%;
+    width: 100%;
+} */
+
+/* -------------------------------------------------------------------------- */
+.search {
+    height: 45px;
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search * {
+    position: absolute;
+}
+
+.search i {
+    left: 10px;
+    width: 30px;
+    text-align: center;
+}
+
+.search input {
+    width: 100%;
+    border-radius: var(--size-border-radius);
+    padding-left: 40px;
+}
+
+/* -------------------------------------------------------------------------- */
+.state_selection {
+    min-width: 100%;
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.state_selection div {
+    width: 47%;
+    cursor: pointer;
+}
+
+.state_selection div.selected {
+    border-bottom: solid 3px var(--color-card-important);
+}
+
+.state_selection p {
+    text-align: center;
+}
+
+/* -------------------------------------------------------------------------- */
+.card_list {
+    /* border: solid 3px var(--color-card-important); */
+    padding: 0.5em;
+    border-radius: var(--size-border-radius);
+}
+
+.card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: var(--size-border-radius);
+    padding: 0.5em 0.25em;
+}
+
+.card:hover {
+    background: rgb(255, 255, 255, 0.5);
+    cursor: pointer;
+}
+
+/* -------------------------------------------------------------------------- */
+.switch {
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 0 auto;
+    width: var(--switch-size);
+}
+
+.switch .input_switch[type=checkbox] {
+    height: 0;
+    width: 0;
+    visibility: hidden;
+}
+
+.switch .label_switch {
+    cursor: pointer;
+    text-indent: -9999px;
+    width: 100%;
+    height: calc(var(--switch-size)/2);
+    background: grey;
+    border-radius: 100px;
+    position: relative !important;
+    padding: calc(var(--switch-size) * 0.05);
+    display: flex;
+    justify-content: start;
+    align-items: center;
+}
+
+.switch .label_switch:after {
+    content: '';
+    position: absolute;
+    margin: auto;
+    width: calc(var(--switch-size) * 0.40);
+    height: calc(var(--switch-size) * 0.40);
+    background: #fff;
+    border-radius: 90px;
+    transition: 0.3s;
+}
+
+.switch .input_switch:checked+.label_switch {
+    background: #bada55;
+}
+
+.switch .input_switch:checked+.label_switch {
+    justify-content: end;
+    /* left: calc(100% - 5px); */
+    /* transform: translateX(-100%); */
+}
+
+.switch .label_switch:active:after {
+
+    width: calc(var(--switch-size) * 0.40);
+}
+
+/* -------------------------------------------------------------------------- */
+.input_container {
+    position: relative;
+    margin-top: 30px;
+    height: 50px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-self: center;
+}
+
+.input_container .input_text,
+.input_container .input_text:disabled {
+    font-size: 18px;
+    padding: 10px;
+    border: none;
+    border-bottom: 1px solid #757575;
+    background: transparent;
+    width: 100%;
+    color: var(--color-black);
+}
+
+.input_container .input_text:focus,
+.input_container .input_text:disabled:focus {
+    outline: none;
+}
+
+/* LABEL ======================================= */
+.input_container .label_text {
+    color: rgba(111, 111, 111, 1);
+    font-size: 18px;
+    font-weight: bold;
+    position: absolute;
+    pointer-events: none;
+    left: 5px;
+    top: 10px;
+    transition: 0.2s ease all;
+    -moz-transition: 0.2s ease all;
+    -webkit-transition: 0.2s ease all;
+    letter-spacing: 2px;
+}
+
+/* active state */
+.input_container .input_text:focus~.label_text,
+.input_container .input_text:valid~.label_text,
+.input_container .input_text:disabled~.label_text {
+    top: -20px;
+    font-size: 15px;
+    color: var(--color-card-important);
+    text-transform: uppercase;
+}
+
+/* BOTTOM BARS ================================= */
+.input_container .bar {
+    position: relative;
+    display: block;
+    /* width: 300px; */
+}
+
+.input_container .bar:before,
+.input_container .bar:after {
+    content: '';
+    height: 2px;
+    width: 0;
+    bottom: 1px;
+    position: absolute;
+    background: var(--color-card-important);
+    transition: 0.2s ease all;
+    -moz-transition: 0.2s ease all;
+    -webkit-transition: 0.2s ease all;
+}
+
+.input_container .bar:before {
+    left: 50%;
+}
+
+.input_container .bar:after {
+    right: 50%;
+}
+
+/* active state */
+.input_container .input_text:focus~.bar:before,
+.input_container .input_text:focus~.bar:after {
+    width: 50%;
+}
+
+/* HIGHLIGHTER ================================== */
+.input_container .highlight {
+    position: absolute;
+    height: 60%;
+    width: 100px;
+    top: 25%;
+    left: 0;
+    pointer-events: none;
+    opacity: 0.5;
+}
+
+/* active state */
+.input_container .input_text:focus~.highlight,
+.input_container .input_text:disabled:focus~.highlight {
+    -webkit-animation: inputHighlighter 0.3s ease;
+    -moz-animation: inputHighlighter 0.3s ease;
+    animation: inputHighlighter 0.3s ease;
+}
+
+
+/* ANIMATIONS ================ */
+@-webkit-keyframes inputHighlighter {
+    from {
+        background: var(--color-card-important);
+    }
+
+    to {
+        width: 0;
+        background: transparent;
+    }
+}
+
+@-moz-keyframes inputHighlighter {
+    from {
+        background: var(--color-card-important);
+    }
+
+    to {
+        width: 0;
+        background: transparent;
+    }
+}
+
+@keyframes inputHighlighter {
+    from {
+        background: var(--color-card-important);
+    }
+
+    to {
+        width: 0;
+        background: transparent;
+    }
+}
+
+/* -------------------------------------------------------------------------- */
+.options {
+    display: flex;
+    justify-content: space-evenly;
+}
+.options div{
+    display: flex;
+    justify-content: center;
+}
+
+.options .edit button:before,
+.options .edit button:after,
+.options .edit button span:before,
+.options .edit button span:after {
+    background: var(--color-text-important);
+}
+
+.options .edit button {
+    background: var(--color-text-important);
+}
+
+.options .edit button span:hover {
+    color: var(--color-text-important);
+}
+
+.options .delete button:before,
+.options .delete button:after,
+.options .delete button span:before,
+.options .delete button span:after {
+    background: var(--color-card-important);
+}
+
+.options .delete button {
+    background: var(--color-card-important);
+}
+
+.options .delete button span:hover {
+    color: var(--color-card-important);
+}
+
+.options button {
+    all: unset;
+    color: #fff;
+    border-radius: 5px;
+    font-family: 'Lato', sans-serif;
+    font-weight: 500;
+    background: transparent;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.options button span {
+    position: relative;
+    display: block;
+    padding: 0.25em 0.5em;
+}
+
+
+.options button:before,
+.options button:after {
+    position: absolute;
+    content: "";
+    right: 0;
+    top: 0;
+    transition: all 0.3s ease;
+}
+
+.options button:before {
+    height: 0%;
+    width: 2px;
+}
+
+.options button:after {
+    width: 0%;
+    height: 2px;
+}
+
+.options button:hover {
+    background: transparent;
+    box-shadow: none;
+}
+
+.options button:hover:before {
+    height: 100%;
+}
+
+.options button:hover:after {
+    width: 100%;
+}
+
+.options button span:hover {
+    width: 100%;
+}
+
+.options button span:before,
+.options button span:after {
+    position: absolute;
+    content: "";
+    left: 0;
+    bottom: 0;
+    transition: all 0.3s ease;
+}
+
+.options button span:before {
+    width: 2px;
+    height: 0%;
+}
+
+.options button span:after {
+    width: 0%;
+    height: 2px;
+}
+
+.options button span:hover:before {
+    height: 100%;
+}
+
+.options button span:hover:after {
+    width: 100%;
+}
+
