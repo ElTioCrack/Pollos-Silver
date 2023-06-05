@@ -9,6 +9,7 @@ $nombres = filter_input(INPUT_POST, 'nombres', FILTER_SANITIZE_STRING);
 $apellidos = filter_input(INPUT_POST, 'apellidos', FILTER_SANITIZE_STRING);
 $telefono = filter_input(INPUT_POST, 'telefono', FILTER_VALIDATE_INT);
 $id_sucursal = filter_input(INPUT_POST, 'id_sucursal', FILTER_VALIDATE_INT);
+$estado = filter_input(INPUT_POST, 'estado', FILTER_VALIDATE_INT);
 
 // Validar y obtener los datos a actualizar para usuarios
 $contrasena = filter_input(INPUT_POST, 'contrasena', FILTER_SANITIZE_STRING);
@@ -19,13 +20,13 @@ if ($ci === false || $nombres === null || $apellidos === null || $telefono === f
 }
 
 // Consulta SQL para actualizar los campos de un empleado
-$queryEmpleados = "UPDATE empleados SET nombres = ?, apellidos = ?, telefono = ?, id_sucursal = ? WHERE ci = ?";
+$queryEmpleados = "UPDATE empleados SET nombres = ?, apellidos = ?, telefono = ?, id_sucursal = ?, estado = ? WHERE ci = ?";
 
 // Preparar la declaración para empleados
 $stmtEmpleados = mysqli_prepare($connection, $queryEmpleados);
 
 // Vincular los parámetros para empleados
-mysqli_stmt_bind_param($stmtEmpleados, "ssiii", $nombres, $apellidos, $telefono, $id_sucursal, $ci);
+mysqli_stmt_bind_param($stmtEmpleados, "ssiiii", $nombres, $apellidos, $telefono, $id_sucursal, $estado, $ci);
 
 // Consulta SQL para actualizar la contraseña de un usuario
 $queryUsuarios = "UPDATE usuarios SET contrasena = ? WHERE ci = ?";
@@ -59,7 +60,7 @@ try {
 
         $response = [
             "success" => true,
-            "message" => "Empleado y contraseña de usuario actualizados correctamente",
+            "message" => "La información del empleado se ha actualizado correctamente.",
             "rowsAffectedEmpleados" => $rowsAffectedEmpleados,
             "rowsAffectedUsuarios" => $rowsAffectedUsuarios
         ];
@@ -69,7 +70,7 @@ try {
 
         $response = [
             "success" => false,
-            "message" => "No se encontró ningún empleado y/o usuario con el número de CI proporcionado"
+            "message" => "No se han realizado cambios en la información del empleado."
         ];
     }
 } catch (Exception $e) {

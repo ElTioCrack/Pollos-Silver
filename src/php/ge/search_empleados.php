@@ -3,9 +3,11 @@ include('../connection.php');
 
 $response = [];
 
-if (isset($_POST["state"])) {
+if (isset($_POST["state"]) && isset($_POST["search"])) { // Verificar si tanto "state" como "search" están definidos en el POST
     $state = $_POST["state"];
-    // $state = 1;
+    $search = $_POST["search"];
+    $searchTerm = "%{$search}%";
+
     $query = "SELECT 
                   usuarios.ci, usuarios.contrasena, 
                   tipousuario.id_tipousuario, tipousuario.tipo as tipo_tipousuario,
@@ -20,13 +22,13 @@ if (isset($_POST["state"])) {
               LEFT JOIN sucursales on sucursales.id_sucursal = empleados.id_sucursal
               LEFT JOIN coordenadas ON coordenadas.id_coordenada = sucursales.id_coordenada
               LEFT JOIN ciudad on ciudad.id_ciudad = sucursales.id_ciudad
-              WHERE empleados.estado = ?";
+              WHERE empleados.estado = ? AND (usuarios.ci LIKE ? OR empleados.nombres LIKE ? OR empleados.apellidos LIKE ?)";
 
     $stmt = mysqli_prepare($connection, $query);
-    mysqli_stmt_bind_param($stmt, "i", $state);
+    mysqli_stmt_bind_param($stmt, "isss", $state, $searchTerm, $searchTerm, $searchTerm);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
-    
+
     if ($result) {
         while ($row = mysqli_fetch_assoc($result)) {
             $fecha_hora_coordenada = new DateTime($row["fecha_hora_coordenada"]);
@@ -65,15 +67,16 @@ if (isset($_POST["state"])) {
                 "estado" => $row["estado"],
             ];
         }
-        
+
         mysqli_free_result($result);
     } else {
         die("Query failed: " . mysqli_error($connection));
     }
-    
+
     mysqli_stmt_close($stmt);
 }
 
 mysqli_close($connection);
 
 echo json_encode($response);
+?>
