@@ -208,10 +208,12 @@ function create_employee_card_list(empleados, sucursales) {
   });
 
   // Boton Guardar
-  $(".btn_options #save_edit").click(function(e) {
+  $(".btn_options #save_edit").click(function (e) {
     let card = $(this).closest(".card");
-    let state_change = Boolean(data_empleado.estado) !== Boolean(card.find("#state").is(":checked"));
-    
+    let state_change =
+      Boolean(data_empleado.estado) !==
+      Boolean(card.find("#state").is(":checked"));
+
     get_data_empleado(card);
     edit_empleado(
       data_empleado.ci,
@@ -230,10 +232,10 @@ function create_employee_card_list(empleados, sucursales) {
       input_bool(card, true);
       card.find(".btn_options div").eq(0).show();
       card.find(".btn_options div").eq(1).hide();
-  
+
       // Si se editó el estado
       if (state_change) {
-        console.log("se edito el estado")
+        console.log("se edito el estado");
         let state = Boolean(data_empleado.estado);
         $("#search_state").prop("checked", state);
         list_employees(get_state($("#search_state")));
