@@ -58,7 +58,12 @@ function login(ci, password, system) {
       handleResponse(authentication);
       return login_empleado(ci, password, system).then((response) => {
         handleResponse(response);
-        window.location.href = "../../views/db/dashboard.html";
+        console.log(JSON.stringify(response));
+        console.log(response.estado);
+        if (response.estado === 1)
+          window.location.href = "../../views/db/dashboard.html";
+        // alert()
+        else alert("Acceso no Autorizado!");
       });
     })
     .catch((error) => {

@@ -1,4 +1,9 @@
 $(document).ready(() => {
+  // Gestion de roles
+  if (tipo_usuario == "Empleado") {
+    $(".input_create").hide();
+  }ñ
+
   list_employees(1);
 
   //Funcion de switch para listar emmpleados
@@ -158,6 +163,7 @@ function create_empleado() {
       card.find("#apellidos").prop("disabled", false);
       card.find("#telefono").prop("disabled", false);
       card.find("#contrasena").prop("disabled", false);
+      card.find("#contrasena").attr("value", "");
 
       card.find("#sucursales_list").prop("disabled", false);
       card.find("#sucursales_list").empty();
@@ -235,9 +241,8 @@ function create_empleado() {
                 $("#btn_create").show();
               }
             },
-            error: function (xhr, status, error) {
-              console.log("%c%s", "color: #ff0000", JSON.stringify(xhr));
-              console.log("%c%s", "color: #ff0000", status);
+            error: (error) => {
+              if (typeof error === "object") error = JSON.stringify(error);
               console.log("%c%s", "color: #ff0000", error);
             },
           });
@@ -316,6 +321,11 @@ function create_employee_card_list(empleados, sucursales) {
 
   $(".list-cards .container").html(card_list);
 
+  // Gestion de roles
+  if (tipo_usuario == "Empleado") {
+    $(".btn_options").hide();
+  }
+
   //Botones
   $(".btn_options .options:nth-child(2)").hide();
 
@@ -356,8 +366,6 @@ function create_employee_card_list(empleados, sucursales) {
         Boolean(card.find("#state").is(":checked"));
 
       get_data_empleado(card);
-
-      console.log(JSON.stringify(data_empleado));
 
       edit_empleado(
         data_empleado.ci,

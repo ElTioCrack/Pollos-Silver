@@ -16,12 +16,13 @@ $apellidos = filter_input(INPUT_POST, 'apellidos', FILTER_SANITIZE_STRING);
 $telefono = filter_input(INPUT_POST, 'telefono', FILTER_VALIDATE_INT);
 $id_sucursal = filter_input(INPUT_POST, 'id_sucursal', FILTER_VALIDATE_INT);
 $contrasena = filter_input(INPUT_POST, 'contrasena', FILTER_SANITIZE_STRING);
+$estado = filter_input(INPUT_POST, 'estado', FILTER_VALIDATE_BOOLEAN);
 
 if ($ci === false || $nombres === null || $apellidos === null || $telefono === false || $id_sucursal === false || $contrasena === null) {
     die(json_encode($response));
 }
 
-$queryEmpleados = "UPDATE empleados SET nombres = ?, apellidos = ?, telefono = ?, id_sucursal = ? WHERE ci = ?";
+$queryEmpleados = "UPDATE empleados SET nombres = ?, apellidos = ?, telefono = ?, id_sucursal = ?, estado = ? WHERE ci = ?";
 $queryUsuarios = "SELECT contrasena FROM usuarios WHERE ci = ?";
 $stmtUsuarios = mysqli_prepare($connection, $queryUsuarios);
 mysqli_stmt_bind_param($stmtUsuarios, "i", $ci);
@@ -31,7 +32,9 @@ $row = mysqli_fetch_assoc($resultUsuarios);
 if(!$resultUsuarios) die(json_encode($response));
 $hashedPassword = $row['contrasena'];
 
+// Si son iguales false, si son la misma true
 $isNewPassword = !verifyWithArgon2($contrasena, $hashedPassword);
+
 
 if ($isNewPassword) {
     $queryUsuarios = "UPDATE usuarios SET contrasena = ? WHERE ci = ?";
@@ -44,13 +47,13 @@ try {
     $stmtEmpleados = mysqli_prepare($connection, $queryEmpleados);
     $stmtUsuarios = mysqli_prepare($connection, $queryUsuarios);
 
-    mysqli_stmt_bind_param($stmtEmpleados, "ssiii", $nombres, $apellidos, $telefono, $id_sucursal, $ci);
-    mysqli_stmt_bind_param($stmtUsuarios, "si", $contrasena, $ci);
+    mysqli_stmt_bind_param($stmtEmpleados, "sssiii", $nombres, $apellidos, $telefono, $id_sucursal, $estado, $ci);
 
     mysqli_stmt_execute($stmtEmpleados);
     $rowsAffectedEmpleados = mysqli_stmt_affected_rows($stmtEmpleados);
 
-    if ($isNewPassword) {
+    if ($isNewPassword) {   
+        mysqli_stmt_bind_param($stmtUsuarios, "si", $contrasena, $ci);
         mysqli_stmt_execute($stmtUsuarios);
         $rowsAffectedUsuarios = mysqli_stmt_affected_rows($stmtUsuarios);
     } else {

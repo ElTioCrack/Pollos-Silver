@@ -20,7 +20,7 @@ function encryptWithArgon2($data, $time_cost, $memory_cost, $threads) {
 }
 
 // Ejemplo de uso:
-$data = "1"; // Variable a encriptar
+$data = "2"; // Variable a encriptar
 $time_cost = 8; // Costo de tiempo para Argon2
 $memory_cost = 131072; // Costo de memoria para Argon2
 $threads = 1; // Número de hilos para Argon2

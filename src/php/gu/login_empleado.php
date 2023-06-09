@@ -104,7 +104,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Cerrar la conexión y enviar la respuesta JSON
     mysqli_stmt_close($stmt);
 
-    if (isset($_POST["system"]) && $_POST["system"] == "Webapp") {
+    if (isset($_POST["system"]) && $_POST["system"] == "Webapp" && $row["estado"]===1) {
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_unset();
             session_destroy();
