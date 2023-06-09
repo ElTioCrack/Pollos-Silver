@@ -1,61 +1,63 @@
 <?php
 include('../connection.php');
 
-$response = [];
+$response = [
+    "success" => false,
+    "message" => "No se han realizado cambios en la información del empleado."
+];
 
-// Validar y obtener los datos a actualizar para empleados
+if ($_SERVER["REQUEST_METHOD"] !== "POST") {
+    die(json_encode($response));
+}
+
 $ci = filter_input(INPUT_POST, 'ci', FILTER_VALIDATE_INT);
 $nombres = filter_input(INPUT_POST, 'nombres', FILTER_SANITIZE_STRING);
 $apellidos = filter_input(INPUT_POST, 'apellidos', FILTER_SANITIZE_STRING);
 $telefono = filter_input(INPUT_POST, 'telefono', FILTER_VALIDATE_INT);
 $id_sucursal = filter_input(INPUT_POST, 'id_sucursal', FILTER_VALIDATE_INT);
-$estado = filter_input(INPUT_POST, 'estado', FILTER_VALIDATE_INT);
-
-// Validar y obtener los datos a actualizar para usuarios
 $contrasena = filter_input(INPUT_POST, 'contrasena', FILTER_SANITIZE_STRING);
 
-// Verificar si falta algún campo requerido
 if ($ci === false || $nombres === null || $apellidos === null || $telefono === false || $id_sucursal === false || $contrasena === null) {
     die(json_encode($response));
 }
 
-// Consulta SQL para actualizar los campos de un empleado
-$queryEmpleados = "UPDATE empleados SET nombres = ?, apellidos = ?, telefono = ?, id_sucursal = ?, estado = ? WHERE ci = ?";
-
-// Preparar la declaración para empleados
-$stmtEmpleados = mysqli_prepare($connection, $queryEmpleados);
-
-// Vincular los parámetros para empleados
-mysqli_stmt_bind_param($stmtEmpleados, "ssiiii", $nombres, $apellidos, $telefono, $id_sucursal, $estado, $ci);
-
-// Consulta SQL para actualizar la contraseña de un usuario
-$queryUsuarios = "UPDATE usuarios SET contrasena = ? WHERE ci = ?";
-
-// Preparar la declaración para usuarios
+$queryEmpleados = "UPDATE empleados SET nombres = ?, apellidos = ?, telefono = ?, id_sucursal = ? WHERE ci = ?";
+$queryUsuarios = "SELECT contrasena FROM usuarios WHERE ci = ?";
 $stmtUsuarios = mysqli_prepare($connection, $queryUsuarios);
+mysqli_stmt_bind_param($stmtUsuarios, "i", $ci);
+mysqli_stmt_execute($stmtUsuarios);
+$resultUsuarios = mysqli_stmt_get_result($stmtUsuarios);
+$row = mysqli_fetch_assoc($resultUsuarios);
+if(!$resultUsuarios) die(json_encode($response));
+$hashedPassword = $row['contrasena'];
 
-// Vincular los parámetros para usuarios
-mysqli_stmt_bind_param($stmtUsuarios, "si", $contrasena, $ci);
+$isNewPassword = !verifyWithArgon2($contrasena, $hashedPassword);
 
-// Iniciar una transacción
+if ($isNewPassword) {
+    $queryUsuarios = "UPDATE usuarios SET contrasena = ? WHERE ci = ?";
+    $contrasena = encryptWithArgon2($contrasena);
+}
+
 mysqli_begin_transaction($connection);
 
 try {
-    // Ejecutar la consulta para empleados
-    mysqli_stmt_execute($stmtEmpleados);
+    $stmtEmpleados = mysqli_prepare($connection, $queryEmpleados);
+    $stmtUsuarios = mysqli_prepare($connection, $queryUsuarios);
 
-    // Obtener el número de filas afectadas para empleados
+    mysqli_stmt_bind_param($stmtEmpleados, "ssiii", $nombres, $apellidos, $telefono, $id_sucursal, $ci);
+    mysqli_stmt_bind_param($stmtUsuarios, "si", $contrasena, $ci);
+
+    mysqli_stmt_execute($stmtEmpleados);
     $rowsAffectedEmpleados = mysqli_stmt_affected_rows($stmtEmpleados);
 
-    // Ejecutar la consulta para usuarios
-    mysqli_stmt_execute($stmtUsuarios);
+    if ($isNewPassword) {
+        mysqli_stmt_execute($stmtUsuarios);
+        $rowsAffectedUsuarios = mysqli_stmt_affected_rows($stmtUsuarios);
+    } else {
+        $rowsAffectedUsuarios = 0;
+    }
 
-    // Obtener el número de filas afectadas para usuarios
-    $rowsAffectedUsuarios = mysqli_stmt_affected_rows($stmtUsuarios);
-
-    // Verificar si se actualizaron filas en ambas consultas
     if ($rowsAffectedEmpleados > 0 || $rowsAffectedUsuarios > 0) {
-        // Confirmar la transacción
         mysqli_commit($connection);
 
         $response = [
@@ -65,31 +67,36 @@ try {
             "rowsAffectedUsuarios" => $rowsAffectedUsuarios
         ];
     } else {
-        // Revertir la transacción
         mysqli_rollback($connection);
-
-        $response = [
-            "success" => false,
-            "message" => "No se han realizado cambios en la información del empleado."
-        ];
     }
 } catch (Exception $e) {
-    // Revertir la transacción en caso de error
     mysqli_rollback($connection);
-
-    $response = [
-        "success" => false,
-        "message" => "Error en la transacción: " . $e->getMessage()
-    ];
+    $response["message"] = "Error en la transacción: " . $e->getMessage();
 }
 
-// Cerrar las declaraciones
 mysqli_stmt_close($stmtEmpleados);
 mysqli_stmt_close($stmtUsuarios);
-
-// Cerrar la conexión a la base de datos
 mysqli_close($connection);
 
-// Devolver la respuesta en formato JSON
 echo json_encode($response);
-?>
+
+function encryptWithArgon2($data)
+{
+    $time_cost = 8; // Costo de tiempo para Argon2
+    $memory_cost = 131072; // Costo de memoria para Argon2
+    $threads = 1; // Número de hilos para Argon2
+
+    // Genera el hash de la variable utilizando Argon2
+    $hashedData = password_hash($data, PASSWORD_ARGON2I, [
+        'time_cost' => $time_cost,
+        'memory_cost' => $memory_cost,
+        'threads' => $threads
+    ]);
+
+    return $hashedData;
+}
+
+function verifyWithArgon2($input, $hash)
+{
+    return password_verify($input, $hash);
+}

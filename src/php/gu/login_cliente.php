@@ -68,4 +68,3 @@ if (isset($_POST["ci"], $_POST["password"])) {
 echo json_encode($response);
 
 mysqli_close($connection);
-?>

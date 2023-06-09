@@ -1,15 +1,23 @@
 $(document).ready(() => {
   list_employees(1);
+
+  //Funcion de switch para listar emmpleados
   $("#search_state").change(function () {
+    $("#btn_create").show();
     list_employees(get_state($(this)));
   });
 
+  // Boton para crear empleado
+  $("#btn_create").click(function () {
+    $(this).hide();
+    create_empleado();
+  });
+
+  // Campo de texto para la busqueda
   $(".input_search input").on("input", function (event) {
     let search = $(this).val();
     if (search.length >= 1) {
       let state = get_state($("#search_state"));
-      console.log("search: " + search);
-      console.log("state: " + state);
       employee_list_with_search(state, search);
     } else {
       list_employees(get_state($("#search_state")));
@@ -18,13 +26,15 @@ $(document).ready(() => {
 });
 
 var data_empleado = {};
+var default_password = "***************";
 function get_data_empleado(card) {
   data_empleado = {
     ci: card.find("#ci").val(),
     nombres: card.find("#nombres").val(),
     apellidos: card.find("#apellidos").val(),
     telefono: card.find("#telefono").val(),
-    contrasena: card.find("#contrasena").val(),
+    //contrasena: card.find("#contrasena").val(),
+    contrasena: card.find("#contrasena").data("contrasena"),
     id_sucursal: card.find("#sucursales_list").val(),
     estado: card.find("#state").is(":checked") ? 1 : 0,
     // "estado": Boolean(card.find("#state").is(":checked")),
@@ -138,6 +148,113 @@ function edit_empleado(
   });
 }
 /* -------------------------------------------------------------------------- */
+//Crear Empleado
+function create_empleado() {
+  get_sucursales(1)
+    .then((sucursales) => {
+      let card = create_card();
+      card.find("#ci").prop("disabled", false);
+      card.find("#nombres").prop("disabled", false);
+      card.find("#apellidos").prop("disabled", false);
+      card.find("#telefono").prop("disabled", false);
+      card.find("#contrasena").prop("disabled", false);
+
+      card.find("#sucursales_list").prop("disabled", false);
+      card.find("#sucursales_list").empty();
+      let sucursales_list = "";
+      sucursales.forEach((sucursal) => {
+        sucursales_list += `<option value="${sucursal.id}">${sucursal.nombre}</option>`;
+      });
+      card.find("#sucursales_list").html(sucursales_list);
+
+      card.find("#state").prop("disabled", false);
+      card.find("#state").attr("checked", true);
+
+      card.find(".btn_options .options:nth-child(1)").hide();
+      card.find(".btn_options .options:nth-child(2)").html(`
+        <button id="create" class="confirm button">Guardar</button>
+        <button id="cancel_create" class="cancel button">Cancelar</button>
+      `);
+
+      $(".list-cards .container").html(card.prop("outerHTML"));
+
+      $("#ci").focus();
+
+      // Modificar css
+      $(".card").css("height", "480px");
+      $(".card .card-title").css("top", "-35px");
+      $(".card .content").css({
+        top: "50px",
+        height: "430px",
+      });
+      //
+      $("#contrasena")
+        .off("focus")
+        .focus(function () {
+          $(this).val("");
+        });
+
+      $("#contrasena")
+        .off("blur")
+        .blur(function () {
+          let contrasena = $(this).val();
+          if (contrasena.length > 0) {
+            $(this).data("contrasena", contrasena);
+          }
+          $(this).val(default_password);
+        });
+      //
+      $("#create")
+        .off("click")
+        .click(function () {
+          //llamar al procedimiendo crear empleado
+          let card = $(this).closest(".card");
+          get_data_empleado(card);
+
+          $.ajax({
+            url: "../../php/ge/create_empleado.php",
+            type: "post",
+            dataType: "json",
+            data: {
+              ci: data_empleado.ci,
+              contrasena: data_empleado.contrasena,
+              id_sucursal: data_empleado.id_sucursal,
+              nombres: data_empleado.nombres,
+              apellidos: data_empleado.apellidos,
+              telefono: data_empleado.telefono,
+              estado: data_empleado.estado,
+            },
+            success: function (response) {
+              alert(response.mensaje);
+              if (response.creado) {
+                list_employees(data_empleado.estado);
+                $("#search_state").attr(
+                  "checked",
+                  Boolean(data_empleado.estado)
+                );
+                $("#btn_create").show();
+              }
+            },
+            error: function (xhr, status, error) {
+              console.log("%c%s", "color: #ff0000", JSON.stringify(xhr));
+              console.log("%c%s", "color: #ff0000", status);
+              console.log("%c%s", "color: #ff0000", error);
+            },
+          });
+        });
+
+      $("#cancel_create")
+        .off("click")
+        .click(function () {
+          list_employees(get_state($("#search_state")));
+          $("#btn_create").show();
+        });
+    })
+    .catch((error) => {
+      console.log("%c%s", "color: #ff0000", error);
+    });
+}
+/* -------------------------------------------------------------------------- */
 // Listar empleados
 function list_employees(state) {
   get_empleados(state)
@@ -147,7 +264,7 @@ function list_employees(state) {
       );
     })
     .catch((error) => {
-      console.log(error);
+      console.log("%c%s", "color: #ff0000", error);
     });
 }
 
@@ -160,7 +277,7 @@ function employee_list_with_search(search, state) {
       );
     })
     .catch((error) => {
-      console.log(error);
+      console.log("%c%s", "color: #ff0000", error);
     });
 }
 
@@ -173,7 +290,15 @@ function create_employee_card_list(empleados, sucursales) {
     card.find("#nombres").attr("value", empleado.nombres);
     card.find("#apellidos").attr("value", empleado.apellidos);
     card.find("#telefono").attr("value", empleado.telefono);
-    card.find("#contrasena").attr("value", empleado.usuario.contrasena);
+
+    // card.find("#contrasena").attr("value", empleado.usuario.contrasena);
+    card.find("#contrasena").data("contrasena", empleado.usuario.contrasena);
+    // console.log(card.find("#contrasena").data("contrasena"));
+
+    card
+      .find("#contrasena")
+      .attr("data-contrasena", empleado.usuario.contrasena);
+    // console.log('%c%s', 'color: #00ff2a', card.find("#contrasena").attr('data-contrasena'));
 
     card.find("#sucursales_list").empty();
     let sucursales_list = "";
@@ -188,74 +313,101 @@ function create_employee_card_list(empleados, sucursales) {
 
     card_list += card.prop("outerHTML");
   });
+
   $(".list-cards .container").html(card_list);
 
   //Botones
-  $(".btn_options").each(function () {
-    $(this).find("div").eq(1).hide();
-  });
+  $(".btn_options .options:nth-child(2)").hide();
 
   // Boton Editar
-  $(".btn_options #edit").click(function (e) {
-    let card = $(this).closest(".card");
-    get_data_empleado(card);
-    console.log("%c%s", "color: #00ff88", JSON.stringify(data_empleado));
+  $(".btn_options #edit")
+    .off("click")
+    .click(function () {
+      const card = $(this).closest(".card");
+      const contrasenaInput = card.find("#contrasena");
 
-    input_bool(card, false);
+      get_data_empleado(card);
 
-    card.find(".btn_options div").eq(0).hide();
-    card.find(".btn_options div").eq(1).show();
-  });
+      input_bool(card, false);
+
+      contrasenaInput.off("focus").focus(function () {
+        $(this).val("");
+      });
+
+      contrasenaInput.off("blur").blur(function () {
+        const contrasena = $(this).val().trim();
+        if (contrasena.length > 0) {
+          $(this).data("contrasena", contrasena);
+        }
+        $(this).val(default_password);
+      });
+
+      card.find(".btn_options .options").eq(0).hide();
+      card.find(".btn_options .options").eq(1).show();
+    });
 
   // Boton Guardar
-  $(".btn_options #save_edit").click(function (e) {
-    let card = $(this).closest(".card");
-    let state_change =
-      Boolean(data_empleado.estado) !==
-      Boolean(card.find("#state").is(":checked"));
+  $(".btn_options #save_edit")
+    .off("click")
+    .click(function (e) {
+      let card = $(this).closest(".card");
+      let state_change =
+        Boolean(data_empleado.estado) !==
+        Boolean(card.find("#state").is(":checked"));
 
-    get_data_empleado(card);
-    edit_empleado(
-      data_empleado.ci,
-      data_empleado.nombres,
-      data_empleado.apellidos,
-      data_empleado.telefono,
-      data_empleado.contrasena,
-      data_empleado.id_sucursal,
-      data_empleado.estado
-    ).then((response) => {
-      if (response.success) {
-        alert(response.message);
-      } else {
-        console.log("%c%s", "color: #ff0000", response.message);
-      }
-      input_bool(card, true);
-      card.find(".btn_options div").eq(0).show();
-      card.find(".btn_options div").eq(1).hide();
+      get_data_empleado(card);
 
-      // Si se editó el estado
-      if (state_change) {
-        console.log("se edito el estado");
-        let state = Boolean(data_empleado.estado);
-        $("#search_state").prop("checked", state);
-        list_employees(get_state($("#search_state")));
-      }
+      console.log(JSON.stringify(data_empleado));
+
+      edit_empleado(
+        data_empleado.ci,
+        data_empleado.nombres,
+        data_empleado.apellidos,
+        data_empleado.telefono,
+        data_empleado.contrasena,
+        data_empleado.id_sucursal,
+        data_empleado.estado
+      )
+        .then((response) => {
+          if (response.success) {
+            alert(response.message);
+          } else {
+            console.log("%c%s", "color: #ff0000", response.message);
+          }
+          input_bool(card, true);
+          card.find(".btn_options .options").eq(0).show();
+          card.find(".btn_options .options").eq(1).hide();
+
+          // Si se editó el estado
+          if (state_change) {
+            let state = Boolean(data_empleado.estado);
+            $("#search_state").prop("checked", state);
+            list_employees(get_state($("#search_state")));
+          }
+        })
+        .catch((error) => {
+          if (typeof error === "object") error = JSON.stringify(error);
+          console.log("%c%s", "color: #ff0000", error);
+        });
     });
-  });
 
   // Boton Cancelar
-  $(".btn_options #cancel_edit").click(function (e) {
-    let card = $(this).closest(".card");
-    card.find("#nombres").val(data_empleado.nombres);
-    card.find("#apellidos").val(data_empleado.apellidos);
-    card.find("#telefono").val(data_empleado.telefono);
-    card.find("#contrasena").val(data_empleado.contrasena);
-    // card.find("#sucursales_list").
-    // card.find("#state").
-    input_bool(card, true);
-    card.find(".btn_options div").eq(0).show();
-    card.find(".btn_options div").eq(1).hide();
-  });
+  $(".btn_options #cancel_edit")
+    .off("click")
+    .click(function (e) {
+      let card = $(this).closest(".card");
+      card.find("#nombres").val(data_empleado.nombres);
+      card.find("#apellidos").val(data_empleado.apellidos);
+      card.find("#telefono").val(data_empleado.telefono);
+      card.find("#contrasena").val(default_password);
+      card.find("#sucursales_list").val(data_empleado.id_sucursal);
+      card.find("#state").prop("checked", data_empleado.estado);
+
+      input_bool(card, true);
+
+      card.find(".btn_options .options").eq(0).show();
+      card.find(".btn_options .options").eq(1).hide();
+    });
 }
 
 function input_bool(card, bool) {
@@ -299,7 +451,7 @@ function create_card() {
             <label class="label_text">Telefono:</label>
           </div>
           <div class="input_container">
-            <input type="text" id="contrasena" class="input_text"  disabled required>
+            <input type="text" id="contrasena" class="input_text" value="${default_password}" data-contrasena="${default_password}"disabled required>
             <span class="highlight"></span>
             <span class="bar"></span>
             <label class="label_text">Contraseña:</label>
@@ -316,12 +468,12 @@ function create_card() {
             <p>Activo</p>
           </div>
           <div class="btn_options">
-            <div>
-              <button id="edit">Editar</button>
+            <div class="options">
+              <button id="edit" class="button">Editar</button>
             </div>
-            <div>
-              <button id="save_edit">Guardar</button>
-              <button id="cancel_edit">Cancelar</button>
+            <div class="options">
+              <button id="save_edit" class="confirm button">Guardar</button>
+              <button id="cancel_edit" class="cancel button">Cancelar</button>
             </div>
           </div>
         </div>

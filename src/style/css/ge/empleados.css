@@ -33,6 +33,7 @@
     display: flex;
     flex-direction: column;
     justify-content: center;
+    align-items: center;
     width: 80%;
     margin: 50px 0;
     padding: 20px;
@@ -147,6 +148,7 @@
 .swich_state div {
     display: flex;
 }
+
 input[type="checkbox"] {
     background-image: -webkit-linear-gradient(hsla(0, 0%, 0%, .1), hsla(0, 0%, 100%, .1)), -webkit-linear-gradient(left, rgb(245, 43, 43) 50%, rgb(0, 199, 27) 50%);
     background-size: 100% 100%, 200% 100%;
@@ -177,7 +179,28 @@ input[type="checkbox"]:checked {
     padding-left: 25px;
     padding-right: 0;
 }
+/* -------------------------------------------------------------------------- */
+.input_search{
+    position: relative;
+    display: flex;
+    align-items: center;
+    /* justify-content: center; */
+}
+.input_search label {
+    position: absolute;
+    left: 10px;
+}
+.input_search input{
+    border-radius: 50px;
+    width: 0px;
+    transition: 0.5s;
+    padding: 0.5em 1.25em;
+}
+.input_search input:focus{
+    width: 400px;
+    padding: 0.5em 1.25em 0.5em 2.25em;
 
+}
 /* --------------------------------- Inputs --------------------------------- */
 .input_container {
     position: relative;
@@ -315,7 +338,17 @@ input[type="checkbox"]:checked {
         background: transparent;
     }
 }
-.btn_options div button {
+.input_create{
+    height: 60px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.button button {
+    all: unset !important;
+}
+
+.button {
     all: unset;
     padding: 0.5em 1em;
     border-radius: 12px;
@@ -327,9 +360,32 @@ input[type="checkbox"]:checked {
     font-weight: bold;
     letter-spacing: 3px;
 }
-.btn_options div button:hover{
+
+.button:hover {
     background: none;
     border: #333 1px solid;
     color: #000;
 
+}
+
+.confirm {
+    background: #08b943;
+    color: #fff;
+}
+
+.confirm:hover {
+    background: #fff;
+    border: #08b943 1px solid;
+    color: #08b943;
+}
+
+.cancel {
+    background: #c71616;
+    color: #fff;
+}
+
+.cancel:hover {
+    background: #fff;
+    border: #c71616 1px solid;
+    color: #c71616;
 }
