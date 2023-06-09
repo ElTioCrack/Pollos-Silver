@@ -2,7 +2,7 @@ $(document).ready(() => {
   // Gestion de roles
   if (tipo_usuario == "Empleado") {
     $(".input_create").hide();
-  }ñ
+  }
 
   list_employees(1);
 
