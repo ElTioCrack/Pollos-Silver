@@ -51,7 +51,7 @@ function login(ci, password, system) {
       return login_empleado(ci, password, system).then((response) => {
         console.log(response.estado);
         if (response.estado === 1) {
-          // window.location.href = "../../views/db/dashboard.html";
+          window.location.href = "../../views/db/dashboard.html";
         } else {
           alert("Acceso no Autorizado!");
         }
