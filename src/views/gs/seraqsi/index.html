@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Crear Sucursal</title>
+    <link rel="stylesheet" href="../../style/css/iyr/tabla.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+   
+    <script>
+        $(document).ready(function() {
+            // Abrir el modal al hacer clic en el botón "Crear Sucursal"
+            $("#btnCrearSucursal").click(function() {
+                $("#modalCrearSucursal").show();
+            });
+
+            // Cerrar el modal al hacer clic en el botón "Cancelar"
+            $("#btnCancelar").click(function() {
+                $("#modalCrearSucursal").hide();
+            });
+
+            // Enviar el formulario al hacer clic en el botón "Guardar"
+            $("#btnGuardar").click(function() {
+                var formData = $("#formularioCrearSucursal").serialize();
+                $.ajax({
+                    url: "../gs/seraqsi/guardar_sucursal.php",
+                    type: "POST",
+                    data: formData,
+                    success: function(response) {
+                        // Mostrar mensaje de éxito o error
+                        alert(response);
+
+                        // Limpiar el formulario
+                        $("#formularioCrearSucursal")[0].reset();
+
+                        // Cerrar el modal
+                        $("#modalCrearSucursal").hide();
+                    }
+                });
+            });
+        });
+    </script>
+</head>
+<body>
+     <style>
+        /* Estilos para el modal */
+        #modalCrearSucursal{
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+        #modalEditarSucursal{
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
+        }
+
+        #modalCrearSucursal .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+        }
+ #modalEditarSucursal .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 600px;
+        }
+        /* Estilos responsive para el modal */
+        @media screen and (max-width: 768px) {
+            #modalCrearSucursal .modal-content {
+                margin: 10% auto;
+                padding: 10px;
+            }
+            #modalEditarSucursal .modal-content{
+                margin: 10% auto;
+                padding: 10px;
+            }
+        }
+
+    .boton-descarga {
+    display: inline-block;
+    margin-top: 20px;
+    cursor: pointer;
+    padding: 20px 40px;
+    background-color: #ff8a3b;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    text-align: center;
+    transition: background-color 0.3s ease;
+}
+    </style>
+    <center>
+    <h1>Sucursales</h1>
+
+    <!-- Botón para abrir el modal -->
+    <button class="boton-descarga" id="btnCrearSucursal">Crear Sucursal</button>
+</center>
+
+
+    <!-- Modal para el formulario -->
+    <div id="modalCrearSucursal">
+        <div class="modal-content">
+        <h2>Nueva Sucursal</h2>
+      <form id="formularioCrearSucursal" style="max-width: 400px; margin: 0 auto;">
+          
+  <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+    <label for="id_sucursal" style="margin-bottom: 5px;">ID Sucursal:</label>
+    <input type="number" name="id_sucursal" id="id_sucursal" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;" required>
+  </div>
+
+  <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+    <label for="latitud" style="margin-bottom: 5px;">Latitud:</label>
+    <input type="number" required name="latitud" id="latitud" style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+  </div>
+
+  <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+    <label for="longitud" style="margin-bottom: 5px;">Longitud:</label>
+    <input type="number" name="longitud" id="longitud" required style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+  </div>
+
+  <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+    <label for="id_ciudad" style="margin-bottom: 5px;">ID Ciudad:</label>
+    <input type="number" name="id_ciudad" value="1" id="id_ciudad" required style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;" readonly>
+  </div>
+
+  <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+    <label for="nombre" style="margin-bottom: 5px;">Nombre:</label>
+    <input type="text" name="nombre" id="nombre" required style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+  </div>
+
+  <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+    <label for="direccion" style="margin-bottom: 5px;">Dirección:</label>
+    <input type="text" name="direccion" id="direccion" required style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+  </div>
+
+  <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+    <label for="estado" style="margin-bottom: 5px;">Estado:</label>
+    <select type="text" name="estado" id="estado" required style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+  <option value="1">Activo</option>
+  <option value="0" selected>Inactivo</option>
+    </select>
+  </div>
+
+  <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+    <label for="telefono" style="margin-bottom: 5px;">Teléfono:</label>
+    <input type="text" name="telefono" id="telefono" required style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+  </div>
+
+  <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+    <label for="hora_apertura" style="margin-bottom: 5px;">Hora Apertura:</label>
+    <input type="time" name="hora_apertura" id="hora_apertura" required style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+  </div>
+
+  <div style="display: flex; flex-direction: column; margin-bottom: 10px;">
+    <label for="hora_cierre" style="margin-bottom: 5px;">Hora Cierre:</label>
+    <input type="time" name="hora_cierre" id="hora_cierre" required style="padding: 8px; border: 1px solid #ccc; border-radius: 4px;">
+  </div>
+
+  <div style="display: flex; justify-content: space-between; margin-top: 20px;">
+    <button type="button" id="btnCancelar" style="padding: 8px 20px; background-color: #ccc; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Cancelar</button>
+    <button type="button" id="btnGuardar" style="padding: 8px 20px; background-color: #007bff; color: #fff; border: none; border-radius: 4px; cursor: pointer;">Guardar</button>
+  </div>
+</form>
+
+        </div>
+    </div>
+
+  
+    <script>
+        $(document).ready(function() {
+            // Cargar el listado de sucursales al cargar la página
+            cargarListadoSucursales();
+    
+            // Función para cargar el listado de sucursales
+            function cargarListadoSucursales() {
+                $.ajax({
+                    url: "../gs/seraqsi/listado_sucursales.php",
+                    type: "GET",
+                    success: function(response) {
+                        $("#listadoSucursales").html(response);
+    
+                        // Agregar evento de clic al botón de edición
+                        $(".btnEditarSucursal").click(function() {
+                            var idSucursal = $(this).data("id");
+                            cargarFormularioEdicion(idSucursal);
+                        });
+                    }
+                });
+            }
+    
+            // Función para cargar el formulario de edición
+            function cargarFormularioEdicion(idSucursal) {
+                $.ajax({
+                    url: "../gs/seraqsi/formulario_edicion.php",
+                    type: "GET",
+                    data: { id_sucursal: idSucursal },
+                    success: function(response) {
+                        $("#modalEditarSucursal").html(response);
+                        $("#modalEditarSucursal").show();
+                    }
+                });
+            }
+    
+            // Cerrar el modal al hacer clic en el botón "Cancelar"
+            $("#btnCancelarEdicion").click(function() {
+                $("#modalEditarSucursal").hide();
+            });
+        });
+    </script>
+    <center>
+    <h2>Listado de Sucursales</h2>
+    </center>
+    <div id="listadoSucursales"></div>
+    
+    <!-- Modal para el formulario de edición -->
+    <div id="modalEditarSucursal" style="display: none;"></div>
+    
+    
+</body>
+</html>

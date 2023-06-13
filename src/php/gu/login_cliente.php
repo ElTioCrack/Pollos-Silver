@@ -1,70 +1,85 @@
 <?php
 include('../connection.php');
+include('./response.php');
+include('../argon2/encryption.php');
 
 $response = [];
 
-if (isset($_POST["ci"], $_POST["password"])) {
+if ($_SERVER["REQUEST_METHOD"] === "POST") {
+    // Verificar si los campos "ci" y "password" existen y no están vacíos
+    if (!isset($_POST["ci"], $_POST["password"]) || empty($_POST["ci"]) || empty($_POST["password"])) {
+        $response = new ErrorResponse(400, "Los campos CI y contraseña son requeridos.");
+        sendResponse($response);
+    }
+
     $ci = $_POST["ci"];
     $password = $_POST["password"];
 
-    //para prevenir inyecciones SQL
-    if (!is_numeric($ci)) die($response);
+    // Verificar si $ci es un número válido
+    if (!is_numeric($ci)) {
+        $response = new ErrorResponse(400, "El campo CI debe ser numérico.");
+        sendResponse($response);
+    }
+
+    // Prevenir inyecciones SQL en $password
     $password = mysqli_real_escape_string($connection, $password);
 
     // Consulta preparada para proteger contra inyecciones SQL
     $query = "SELECT 
                 usuarios.ci, usuarios.contrasena,
                 tipousuario.id_tipousuario, tipousuario.tipo as tipo_tipousuario,
-                coordenadas.id_coordenada, coordenadas.latitud as latitud_coordenada, coordenadas.longitud as longitud_coordenada, coordenadas.fecha_hora as fecha_hora_coordenada,
                 clientes.nombres, clientes.apellidos, clientes.telefono, clientes.descripcion_direccion, clientes.fecha_hora 
-                FROM usuarios 
-                JOIN tipousuario ON usuarios.id_tipousuario = tipousuario.id_tipousuario 
-                LEFT JOIN clientes ON clientes.ci = usuarios.ci 
-                LEFT JOIN coordenadas ON coordenadas.id_coordenada = clientes.id_coordenada 
-                WHERE usuarios.ci = ? AND usuarios.contrasena = ?";
+              FROM usuarios 
+              JOIN tipousuario ON usuarios.id_tipousuario = tipousuario.id_tipousuario 
+              LEFT JOIN clientes ON clientes.ci = usuarios.ci 
+              WHERE usuarios.ci = ?";
 
     $stmt = mysqli_prepare($connection, $query);
-    mysqli_stmt_bind_param($stmt, "is", $ci, $password);
+
+    if (!$stmt) {
+        $response = new ErrorResponse(500, "Error en la preparación de la consulta: " . mysqli_error($connection));
+        sendResponse($response);
+    }
+
+    mysqli_stmt_bind_param($stmt, "i", $ci);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 
-
     if ($result && $row = mysqli_fetch_assoc($result)) {
-        $response = $row;
-    } else {
-        if ($result && mysqli_num_rows($result) === 0) {
-            die(json_encode($response));
+        if (verifyWithArgon2($password, $row["contrasena"])) {
+            $response = [
+                "usuario" => [
+                    "ci" => $row["ci"],
+                    "contrasena" => $row["contrasena"],
+                    "tipousuario" => [
+                        "id_tipousuario" => $row["id_tipousuario"],
+                        "tipo_tipousuario" => $row["tipo_tipousuario"],
+                    ],
+                ],
+                "nombres" => $row["nombres"],
+                "apellidos" => $row["apellidos"],
+                "telefono" => $row["telefono"],
+                "descripcion_direccion" => $row["descripcion_direccion"],
+                "fecha_hora" => $row["fecha_hora"],
+            ];
         } else {
-            die("Query failed: " . mysqli_error($connection));
+            $response = new ErrorResponse(401, "La contraseña no coincide.");
+            sendResponse($response);
+        }
+    } else {
+        if (mysqli_num_rows($result) === 0) {
+            $response = new ErrorResponse(404, "No se encontró ningún usuario con ese CI.");
+            sendResponse($response);
+        } else {
+            $response = new ErrorResponse(500, "Error en la consulta: " . mysqli_error($connection));
+            sendResponse($response);
         }
     }
 
-    $response = array(
-        "usuario" => array(
-            "ci" => $row["ci"],
-            "contrasena" => $row["contrasena"],
-            "tipousuario" => array(
-                "id_tipousuario" => $row["id_tipousuario"],
-                "tipo_tipousuario" => $row["tipo_tipousuario"],
-            ),
-        ),
-        "coordenadas" => array(
-            "id_coordenada" => $row["id_coordenada"],
-            "latitud_coordenada" => $row["latitud_coordenada"],
-            "longitud_coordenada" => $row["longitud_coordenada"],
-            "fecha_hora_coordenada" => $row["fecha_hora_coordenada"],
-        ),
-        "nombres" => $row["nombres"],
-        "apellidos" => $row["apellidos"],
-        "telefono" => $row["telefono"],
-        "descripcion_direccion" => $row["descripcion_direccion"],
-        "fecha_hora" => $row["fecha_hora"],
-    );
-
-    // Cerrar la conexión y enviar la respuesta JSON
     mysqli_stmt_close($stmt);
 }
 
-echo json_encode($response);
+$response = $response ?: new ErrorResponse(401, "No autorizado");
+sendResponse($response);
 
 mysqli_close($connection);

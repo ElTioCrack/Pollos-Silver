@@ -6,17 +6,56 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>dashboard</title>
+  <script>
+      
+  
 
+
+ 
+      
+      
+    function cargarImagenAleatoria() {
+      // Arreglo de imágenes
+      var imagenes = [
+        "../../img/FotoPerfil/Diapositiva1.JPG",
+        "../../img/FotoPerfil/Diapositiva2.JPG",
+        "../../img/FotoPerfil/Diapositiva3.JPG",
+        "../../img/FotoPerfil/Diapositiva4.JPG",
+        "../../img/FotoPerfil/Diapositiva5.JPG"
+      ];
+      
+      // Obtener un número aleatorio entre 0 y la longitud del arreglo de imágenes
+      var indiceAleatorio = Math.floor(Math.random() * imagenes.length);
+      
+      // Obtener la imagen correspondiente al índice aleatorio
+      var imagenAleatoria = imagenes[indiceAleatorio];
+      
+      var elementoImagen = document.getElementById("imagen");
+      elementoImagen.src = imagenAleatoria;
+    }
+    
+    
+    
+ window.onload = function() { 
+  cargarImagenAleatoria() ;
+}
+  </script>
     <link rel="stylesheet" href="../../style/css/db/db.css">
     <script src="https://kit.fontawesome.com/bbb62af81d.js" crossorigin="anonymous"></script>
 
-    <!-- ----------------------------------------------------------------------- -->
-
+    <script
+      src="https://code.jquery.com/jquery-3.6.0.min.js"
+      integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4="
+      crossorigin="anonymous"
+    ></script>
+ <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+    
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
 
     <script type="text/javascript" src="../../js/gu/logout.js"></script>
     <script type="text/javascript" src="../../js/gu/session_data.js"></script>
+
     <script type="text/javascript">
         var nombres
         var apellidos
@@ -40,11 +79,12 @@
             apellidos = response.apellidos
             $(".user-name").text(nombres + " " + apellidos)
             
-            $("#main").load("../ge/empleados.html");
-
             // Aside
-            $("#btn-inicio").click(function () {
-                $("#main").text("AAA");
+
+            $("#btn-inicio").click(function (e) {
+                //$("#main").load();
+                location.reload();
+                //window.open("https://pollossilver2023.000webhostapp.com/src/views/gu/login.html", '_top')
             })
             $("#btn-clientes").click(function () {
                 $("#main").load("../gc/clientes.html");
@@ -55,12 +95,22 @@
             $("#btn-productos").click(function () {
                 $("#main").load("../gp/ap.html");
             })
-            $("#btn-sucursales").click(function () {
-                $("#main").load("../gs/index.html");
+           
+         
+           $("#btn-sucursales").click(function () {
+              $("#main").load("../gs/seraqsi/index.html");
             })
-            $("#btn-informes").click(function () {
-                $("#main").load("../gs/index.php");
+           $("#btn-inf_clientes").click(function () {
+               $("#main").load("../iyr/informesyreportesclientes.html");
             })
+           $("#btn-inf_empleados").click(function () {
+               $("#main").load("../iyr/informesyreportesEmpleados.html");
+            })
+           $("#btn-inf_pedidos").click(function () {
+               $("#main").load("../iyr/informesyreportespedidos.html");
+            })
+
+
 
             // Detecciones de tipos de usuarios
             tipo_usuario = response.usuario.tipousuario.tipo
@@ -76,6 +126,177 @@
             }
         }
     </script>
+     <style>
+@font-face {
+    font-family: 'FUENTE';
+    src: url('../../style/fonts/op2.ttf') format("truetype");
+  
+  }   
+        .submenu {
+            display: none;
+
+            top: 100%;
+            left: -5px;
+            padding: 0px;
+            background-color: #f1f1f1;
+            border: 1px solid #ccc;
+            z-index: 1;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .submenu.active {
+            display: block;
+            opacity: 1;
+        }
+
+        .submenu a {
+            display: block;
+            color: #333;
+            text-decoration: none;
+            padding: 5px;
+        }
+.box-4{
+  background-color:#eca73f;;
+  width:100%;
+  height:200px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.loader{
+  background-color: grey;
+  width: 70%;
+  height: 110px;
+  border-radius: 60px;
+  position:relative;
+  margin: 100px auto;
+  overflow: hidden;
+  
+}
+.pacman{
+  position: absolute;
+  top: 25%;
+  bottom: 0;
+  left: -10%;
+  z-index: 1;
+  margin: auto:
+}
+.arriba{
+  width: 50px; 
+  height: 25px;  
+  background: #f3e300;
+  border-radius: 100px 100px 0 0;
+  transform: rotate(0deg);
+  transform-origin: 50% 100%; 
+}
+.abajo{
+  width: 50px; 
+  height: 25px; 
+  transform: rotate(0deg);
+  transform-origin: 50% 0px;  
+  background: #f3e300;
+  border-radius: 0 0 100px 100px;  
+}
+
+/*Animaciones Pacman*/
+
+@keyframes come{
+  from{
+    transform: rotate(-45deg)
+  }
+  to{
+    transform:rotate(0);
+  }
+}
+.arriba{
+  animation: come .4s ease alternate infinite;
+}
+@keyframes come2{
+  from{
+    transform: rotate(45deg)
+  }
+  to{
+    transform:rotate(0);
+  }
+}
+.abajo{
+  animation: come2 .4s ease alternate infinite;
+}
+/*Animacion Movimiento Pacman*/
+@keyframes correpacman{
+  100%{
+    left: 100%;
+  }
+}
+.pacman{
+  animation: correpacman 5.8s linear infinite;
+}
+
+/* comida pacman*/
+.comida{
+  display: flex;
+  flex-grow:1; 
+  justify-content: space-around;
+  align-items: center;
+  width: 100%;
+  height: 110px;
+}
+.comida1, .comida2, .comida3, .comida4, .comida5, .comida6 {
+  width: 50px;
+  height: 50px;
+  background: #e8e15400;
+  border-radius: 50%;
+}
+/* Animaciones Comida Pacman */
+
+@keyframes movimiento{
+  0%{
+    transform: scale(0);
+  }
+  65%{
+    transform: scale(0);
+  }
+  70%{
+    transform: scale(2);
+  }
+  75%{
+    transform: scale(1);
+  }
+}
+
+.comida1{
+  animation: movimiento 5.8s infinite .8s;
+}
+.comida2{
+  animation: movimiento 5.8s infinite 1.6s;
+}
+.comida3{
+  animation: movimiento 5.8s infinite 2.6s;
+}
+.comida4{
+  animation: movimiento 5.8s infinite 3.3s;
+}
+.comida5{
+  animation: movimiento 5.8s infinite 4.3s;
+}
+.comida6{
+  animation: movimiento 5.8s infinite 5.2s;
+}
+    .profile-pic {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      overflow: hidden;
+      margin-right: 15px;
+    }
+    
+    .profile-pic img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    </style>
 </head>
 
 <body>
@@ -84,11 +305,15 @@
             <div class="ico-aside">
                 <i id="sidebar-toggle" class="fa-solid fa-bars"></i>
             </div>
-            <div class="title">Pollos Silver</div>
-        </div>
-        <div class="user">
-            <div class="user-name">Nombre del Usuario</div>
-            <button class="log-out-button">Cerrar Sesión</button>
+            <div style=" font-family: 'FUENTE'; font-size: 2.5rem;" class="title">Pollos Silver</div>
+        </div> 
+ <div class="user" >
+<div class="profile-pic">
+  <img id="imagen" style="cursor: pointer;" onclick="cargarImagenAleatoria()" src="../../img/FotoPerfil/Diapositiva1.JPG" alt="Imagen aleatoria">
+   
+</div>
+            <div  class="user-name" style=" font-family: 'FUENTE'; font-size: 1.5rem;">Nombre del Usuario</div>
+            <button onclick="mostrarConfirmacion()" class="log-out-button">Cerrar Sesión</button>
         </div>
     </header>
 
@@ -129,21 +354,72 @@
                 <span class="sidebar-text">Sucursales</span>
             </div>
 
-            <div class="sidebar-button" id="btn-informes">
+            <div class="sidebar-button" id="btn-informes" onclick="toggleSubmenu(event)" >
                 <div class="ico-aside">
                     <i class="fa-solid fa-file"></i>
                 </div>
                 <span class="sidebar-text">Informes y reportes</span>
+
             </div>
+            
+        <div class="submenu" id="submenu">
+            <A><div class="sidebar-button" id="btn-inf_clientes">
+                <div class="ico-aside">
+                       <i class="fa-solid fa-user"></i>
+                </div>
+                <span class="sidebar-text">Clientes</span>
+            </div></A>
+             <A><div class="sidebar-button" id="btn-inf_empleados">
+                <div class="ico-aside">
+                     <i class="fa-solid fa-address-card"></i>
+                </div>
+                <span class="sidebar-text">Empleados</span>
+            </div></A>
+             <A><div class="sidebar-button" id="btn-inf_pedidos">
+                <div class="ico-aside">
+                    <i class="fa-solid fa-shop"></i>
+                </div>
+                <span class="sidebar-text">Pedidos</span>
+            </div></A>
+        </div>
+          <a style=" text-decoration:none;" href="https://pollossilver2023.000webhostapp.com/Inicio/"><div class="sidebar-button" id="btn-exit">
+                <div class="ico-aside">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                </div>
+                <span class="sidebar-text">Salir</span>
+            </div></a>
         </div>
     </aside>
 
     <main id="main">
+       <div class=box-4>
+  <div class="loader">
+    <div class="pacman">
+      <div class="arriba"></div>
+      <div class="abajo"></div>
+    </div>
+    <div class="comida">
+      <img class="comida1" src="https://pollossilver2023.000webhostapp.com/src/img/POYITO.png">
+      <img class="comida2" src="https://pollossilver2023.000webhostapp.com/src/img/POYITO.png">
+      <img class="comida3" src="https://pollossilver2023.000webhostapp.com/src/img/POYITO.png">
+      <img class="comida4" src="https://pollossilver2023.000webhostapp.com/src/img/POYITO.png">
+      <img class="comida5" src="https://pollossilver2023.000webhostapp.com/src/img/POYITO.png">
+      <img class="comida6" src="https://pollossilver2023.000webhostapp.com/src/img/POYITO.png">
+    </div>
+  </div>
+</div>
         <!-- Contenido principal del panel de control -->
-        <h2>En obras, digo en codificacion</h2>
-        <h2>no mentira xd</h2>
-        <h2>ya pensaremos que poner aca para que no este en white digo en blanco</h2>
-        <h2>jajaxdsalu2</h2>
+        <center>
+            <h2 style=" font-family: 'FUENTE'; font-size: 4rem;";>Bienvenido</h2>
+        <h2  style=" font-family: 'FUENTE'; font-size: 2rem;"; class="user-name">...</h2> 
+</center>
+        <p style="font-size: 1.5rem; margin: 25px; justify-content: left; " >Como parte de nuestra gran familia, tienes acceso a una amplia gama de herramientas y funciones diseñadas para facilitar la gestión y supervisión de nuestra página web. Estamos encantados de contar contigo en este rol clave.<br>
+
+Aquí podrás realizar diversas tareas, como agregar, editar y eliminar contenido, administrar usuarios, configurar ajustes y mucho más. Nuestro objetivo es brindarte un entorno intuitivo y eficiente para que puedas llevar a cabo tus responsabilidades de manera efectiva.<br>
+
+Estamos comprometidos en proporcionarte todas las herramientas y recursos necesarios para que puedas administrar nuestra página web de manera exitosa. Si tienes alguna pregunta, consulta o sugerencia, nuestro equipo de soporte estará encantado de ayudarte en todo momento.<br>
+
+Te animamos a explorar todas las opciones disponibles y a familiarizarte con las funcionalidades del panel de administración. Recuerda que estaremos aquí para brindarte asistencia y orientación en cada paso del camino.</p>
     </main>
 
     <!-- <footer>
@@ -214,5 +490,23 @@
     //     });
     // });
 </script>
+
+  <script>
+        function mostrarConfirmacion() {
+            swal({
+                title: "Cierre de sesion",
+                text: "La sesion se cerro correctamente",
+                icon: "success"
+                
+            })
+        }
+    </script>
+ <script>
+        function toggleSubmenu(event) {
+            event.preventDefault();
+            var submenu = document.getElementById("submenu");
+            submenu.classList.toggle("active");
+        }
+    </script>
 
 </html>

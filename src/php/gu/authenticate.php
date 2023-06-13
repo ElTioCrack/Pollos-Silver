@@ -1,13 +1,15 @@
 <?php
 include('../connection.php');
+include('./response.php');
+include('../argon2/encryption.php');
 
 $response = [];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Verificar si los campos "ci" y "password" existen y no están vacíos
     if (!isset($_POST["ci"], $_POST["password"]) || empty($_POST["ci"]) || empty($_POST["password"])) {
-        $response["error"] = "Los campos CI y contraseña son requeridos.";
-        die(json_encode($response));
+        $response = new ErrorResponse(400, "Los campos CI y contraseña son requeridos.");
+        sendResponse($response);
     }
 
     $ci = $_POST["ci"];
@@ -15,25 +17,26 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Verificar si $ci es un número válido
     if (!is_numeric($ci)) {
-        $response["error"] = "El campo CI debe ser numérico.";
-        die(json_encode($response));
+        $response = new ErrorResponse(400, "El campo CI debe ser numérico.");
+        sendResponse($response);
     }
 
     // Prevenir inyecciones SQL en $password
     $password = mysqli_real_escape_string($connection, $password);
 
     // Consulta preparada para proteger contra inyecciones SQL
-    $query = "SELECT usuarios.ci, usuarios.contrasena, 
+    $query = "SELECT 
+                usuarios.ci, usuarios.contrasena, 
                 tipousuario.id_tipousuario, tipousuario.tipo as tipo_tipousuario
-                FROM usuarios 
-                JOIN tipousuario ON tipousuario.id_tipousuario = usuarios.id_tipousuario
-                WHERE usuarios.ci = ?";
+              FROM usuarios 
+              JOIN tipousuario ON tipousuario.id_tipousuario = usuarios.id_tipousuario
+              WHERE usuarios.ci = ?";
 
     $stmt = mysqli_prepare($connection, $query);
 
     if (!$stmt) {
-        $response["error"] = "Error en la preparación de la consulta: " . mysqli_error($connection);
-        die(json_encode($response));
+        $response = new ErrorResponse(500, "Error en la preparación de la consulta: " . mysqli_error($connection));
+        sendResponse($response);
     }
 
     mysqli_stmt_bind_param($stmt, "i", $ci);
@@ -51,27 +54,23 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ],
             ];
         } else {
-            $response["error"] = "La contraseña no coincide.";
-            die(json_encode($response));
+            $response = new ErrorResponse(401, "La contraseña no coincide.");
+            sendResponse($response);
         }
     } else {
         if (mysqli_num_rows($result) === 0) {
-            $response["error"] = "No se encontró ningún usuario con ese CI.";
-            die(json_encode($response));
+            $response = new ErrorResponse(404, "No se encontró ningún usuario con ese CI.");
+            sendResponse($response);
         } else {
-            $response["error"] = "Error en la consulta: " . mysqli_error($connection);
-            die(json_encode($response));
+            $response = new ErrorResponse(500, "Error en la consulta: " . mysqli_error($connection));
+            sendResponse($response);
         }
     }
 
     mysqli_stmt_close($stmt);
 }
 
-echo json_encode($response);
+$response = $response ?: new ErrorResponse(401, "No autorizado");
+sendResponse($response);
 
 mysqli_close($connection);
-
-function verifyWithArgon2(string $userInput, string $storedHash): bool
-{
-    return password_verify($userInput, $storedHash);
-}

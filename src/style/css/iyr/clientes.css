@@ -1,0 +1,68 @@
+@import url('https://fonts.googleapis.com/css?family=Poppins:200,300,400,500,600,700,800,900&display=swap');
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    scroll-behavior: smooth;
+    font-family: 'Poppins', sans-serif;
+    /* background: #f5ebdc;   Background de la pagina(si se cambia se debe cambiar el color de: AP-title) */
+}
+
+.container-AdminCustomers {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
+
+.AC-title {
+    background: #ffffff;
+    box-shadow: 0 8px 32px 0 rgba(129, 129, 129, 0.37);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 20px;
+    margin-top: 30px;
+    border-radius: 20px;
+    width: 80%;
+    text-align: center;
+    text-transform: uppercase;
+}
+
+.AC-title h2 {
+    background: #ffffff;
+}
+
+.AC-principalView {
+    /* background: #6cf; */
+    display: flex;
+    /* align-items: center; */
+    justify-content: center;
+    flex-wrap: wrap;
+    margin-top: 50px;
+    width: 100%;
+}
+
+.AC-principalView {
+    background: #ffffff;
+    ;
+    box-shadow: 0 8px 32px 0 rgba(129, 129, 129, 0.37);
+    backdrop-filter: blur(1.5px);
+    -webkit-backdrop-filter: blur(1.5px);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    padding: 20px;
+    margin-top: 30px;
+    border-radius: 20px;
+    text-align: center;
+    width: 80%;
+}
+
+select[disabled] {
+    all: unset;
+    color: #000;
+    cursor: none;
+    /* background: red; */
+}

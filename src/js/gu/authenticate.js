@@ -45,29 +45,28 @@ function login_empleado(ci, password, system) {
   });
 }
 /* -------------------------------------------------------------------------- */
-function handleResponse(response) {
-  if (response.hasOwnProperty("error") && response.error !== null) {
-    alert(response.error);
-    throw new Error(response.error);
-  }
-}
-
 function login(ci, password, system) {
   authenticate(ci, password)
     .then((authentication) => {
-      handleResponse(authentication);
       return login_empleado(ci, password, system).then((response) => {
-        handleResponse(response);
-        console.log(JSON.stringify(response));
         console.log(response.estado);
-        if (response.estado === 1)
-          window.location.href = "../../views/db/dashboard.html";
-        // alert()
-        else alert("Acceso no Autorizado!");
+        if (response.estado === 1) {
+          // window.location.href = "../../views/db/dashboard.html";
+        } else {
+          alert("Acceso no Autorizado!");
+        }
       });
     })
-    .catch((error) => {
-      if (typeof error === "object") error = JSON.stringify(error);
-      console.log("%c%s", "color: #ff0000", error);
-    });
+    .catch((error) => handleRequestError(error));
+}
+
+function handleRequestError(error) {
+  let errorMessage = "Acceso no Autorizado!";
+
+  if (error.responseJSON && error.responseJSON.errorMessage) {
+    errorMessage = error.responseJSON.errorMessage;
+  }
+
+  alert(`Error: ${error.status}\n${errorMessage}`);
+  console.log("%c%s", "color: #ff0000", JSON.stringify(error));
 }

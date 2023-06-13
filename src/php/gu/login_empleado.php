@@ -1,13 +1,15 @@
 <?php
 include('../connection.php');
+include('./response.php');
+include('../argon2/encryption.php');
 
 $response = [];
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     // Verificar si los campos "ci" y "password" existen y no están vacíos
     if (!isset($_POST["ci"], $_POST["password"]) || empty($_POST["ci"]) || empty($_POST["password"])) {
-        $response["error"] = "Los campos CI y contraseña son requeridos.";
-        die(json_encode($response));
+        $response = new ErrorResponse(400, "Los campos CI y contraseña son requeridos.");
+        sendResponse($response);
     }
 
     $ci = $_POST["ci"];
@@ -15,8 +17,8 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
     // Verificar si $ci es un número válido
     if (!is_numeric($ci)) {
-        $response["error"] = "El campo CI debe ser numérico.";
-        die(json_encode($response));
+        $response = new ErrorResponse(400, "El campo CI debe ser numérico.");
+        sendResponse($response);
     }
 
     // Prevenir inyecciones SQL en $password
@@ -31,26 +33,27 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 ciudad.id_ciudad, ciudad.ciudad as nombre_ciudad,
                 sucursales.nombre as nombre_sucursal, sucursales.direccion as direccion_sucursal, sucursales.estado as estado_sucursal, sucursales.telefono as telefono_sucursal, sucursales.hora_apertura as hora_apertura_sucursal, sucursales.hora_cierre as hora_cierre_sucursal,
                 empleados.nombres, empleados.apellidos, empleados.telefono, empleados.estado
-                FROM usuarios 
-                JOIN tipousuario ON usuarios.id_tipousuario = tipousuario.id_tipousuario
-                LEFT JOIN empleados ON empleados.ci = usuarios.ci 
-                LEFT JOIN sucursales on sucursales.id_sucursal = empleados.id_sucursal
-                LEFT JOIN coordenadas ON coordenadas.id_coordenada = sucursales.id_coordenada
-                LEFT JOIN ciudad on ciudad.id_ciudad = sucursales.id_ciudad
-                WHERE usuarios.ci = ?";
+              FROM usuarios 
+              JOIN tipousuario ON usuarios.id_tipousuario = tipousuario.id_tipousuario
+              LEFT JOIN empleados ON empleados.ci = usuarios.ci 
+              LEFT JOIN sucursales on sucursales.id_sucursal = empleados.id_sucursal
+              LEFT JOIN coordenadas ON coordenadas.id_coordenada = sucursales.id_coordenada
+              LEFT JOIN ciudad on ciudad.id_ciudad = sucursales.id_ciudad
+              WHERE usuarios.ci = ?";
 
     $stmt = mysqli_prepare($connection, $query);
+
     if (!$stmt) {
-        $response["error"] = "Error en la preparación de la consulta: " . mysqli_error($connection);
-        die(json_encode($response));
+        $response = new ErrorResponse(500, "Error en la preparación de la consulta: " . mysqli_error($connection));
+        sendResponse($response);
     }
 
     mysqli_stmt_bind_param($stmt, "i", $ci);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
+    $row = mysqli_fetch_assoc($result);
 
-
-    if ($result && $row = mysqli_fetch_assoc($result)) {
+    if ($result && $row) {
         if (verifyWithArgon2($password, $row["contrasena"])) {
             $fecha_hora_coordenada = new DateTime($row["fecha_hora_coordenada"]);
 
@@ -88,23 +91,20 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 "estado" => $row["estado"],
             ];
         } else {
-            $response["error"] = "La contraseña no coincide.";
-            die(json_encode($response));
+            $response = new ErrorResponse(401, "La contraseña no coincide.");
+            sendResponse($response);
         }
     } else {
         if (mysqli_num_rows($result) === 0) {
-            $response["error"] = "No se encontró ningún usuario con ese CI.";
-            die(json_encode($response));
+            $response = new ErrorResponse(404, "No se encontró ningún usuario con ese CI.");
         } else {
-            $response["error"] = "Error en la consulta: " . mysqli_error($connection);
-            die(json_encode($response));
+            $response = new ErrorResponse(500, "Error en la consulta: " . mysqli_error($connection));
         }
     }
 
-    // Cerrar la conexión y enviar la respuesta JSON
     mysqli_stmt_close($stmt);
 
-    if (isset($_POST["system"]) && $_POST["system"] == "Webapp" && $row["estado"]===1) {
+    if (isset($_POST["system"]) && $_POST["system"] == "Webapp" && $row["estado"] === 1) {
         if (session_status() == PHP_SESSION_ACTIVE) {
             session_unset();
             session_destroy();
@@ -189,11 +189,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     }
 }
 
-echo json_encode($response);
+$response = $response ?: new ErrorResponse(401, "No autorizado");
+sendResponse($response);
 
 mysqli_close($connection);
-
-function verifyWithArgon2(string $userInput, string $storedHash): bool
-{
-    return password_verify($userInput, $storedHash);
-}

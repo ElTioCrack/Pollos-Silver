@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Informes y reportes - Clientes</title>
+    <link rel="stylesheet" href="../../style/css/gc/clientes.css">
+        <link rel="stylesheet" href="../../style/css/iyr/tabla.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.29.1/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script type="text/javascript" src="../../js/gu/session_data.js"></script>
+    <script type="text/javascript">
+        var tipo_usuario
+
+        window.onload = function () {
+            session_data()
+                .then(function (response) {
+                    // usuario logueado?
+                    if (response.length === 0)
+                        window.location.href = "../../views/gu/login.html"
+                    else
+                        init(response)
+                })
+                .catch(function (error) { console.log(error) });
+        };
+
+        function init(response) {
+            // Detecciones de tipos de usuarios
+            tipo_usuario = response.usuario.tipousuario.tipo
+            switch (tipo_usuario) {
+                case "Jefe":
+                    break;
+
+                case "Empleado":
+                    $("#btn-productos").hide();
+                    $("#btn-sucursales").hide();
+                    $("#btn-informes").hide();
+                    break;
+            }
+        }
+    </script>
+     <style>
+    #container_pollo {
+      width: 100%;
+      height: 67px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    #chicken {
+      width: 150px;
+      height: 100px;
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background-image: url("../../img/logo_filtrar.png");
+      background-size: cover;
+      animation: run 10s linear infinite;
+    }
+
+    @keyframes run {
+      0% {
+        left: 0;
+      }
+      50% {
+        left: 750px;
+      }
+      100% {
+        left: 0;
+      }
+    }
+
+  </style>
+</head>
+
+<body>
+     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.5.3/jspdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.6/jspdf.plugin.autotable.min.js"></script>
+    <div class="container-AdminCustomers">
+        <div class="AC-title">
+            <h2>Informes y reportes - Clientes</h2>
+        </div>
+        <div class="AC-title">
+           <div id="container_pollo">
+              <div id="chicken">
+              </div>
+           </div>
+            <center>
+             <div class="AC-title">
+           <input type="text" style="width: 90%;" id="searchNombre" class="shadow-focus-input" placeholder="Buscar por nombre, apellido o CI"> 
+
+           
+<select style="width: 90%;" class="shadow-focus-input" id="estado-select" onchange="filtrarTabla()">
+<option value="todos">Todos</option>
+    <option value="1">Activo</option>
+    <option value="0">Inactivo</option>
+</select>
+
+           <input type="date" class="shadow-focus-input" style="width: 45%;"  id="fecha-inicio" onchange="filtrarTablafecha()" placeholder="Desde...">
+           <input type="date" class="shadow-focus-input" style="width: 45%;" id="fecha-fin" onchange="filtrarTablafecha()" placeholder="...Hasta">
+
+        <button class="download-button button" style="margin-top: 10px;" onclick="generate()">Descargar</button>
+        <a Target="_blank" href="../iyr/estadisticaClientes/EstadisticaCliente.php">
+            <button class="download-button button" button >Estadistica</button>
+        </a>
+        </div>
+        </center>
+        </div>
+      
+        <div class="AC-principalView">
+            <div>
+
+            </div>
+            <div>
+
+
+                <table id="mi-tabla">
+                    <caption>Listado de Clientes</caption>
+                    <thead>
+                        <tr>
+                            <th>CI</th>
+                            <th>Nombres</th>
+                            <th>Apellidos</th>
+                            <th>Telefono</th>
+                            <th>Descripcion de la dirección</th>
+                            <th>Fecha de Registro</th>
+                            <th>Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>1</td>
+                            <td>2</td>
+                            <td>3</td>
+                            <td>4</td>
+                            <td>5</td>
+                            <td>6</td>
+                            <td>7</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+<!-- ----------------------------------------------------------------------- -->
+<script>
+    $(document).ready(function () {
+        list_customers();
+
+        $("#searchNombre").on('input', function (event) {
+            let search = $(this).val();
+            if (search.length > 0) {
+                const url_php = "../../php/iyr/search_customers.php";
+                const postData = {
+                    search: search,
+                };
+                $.post(url_php, postData, function (response) {
+                    response = JSON.parse(response)
+                    var list = "";
+                    response.forEach(function (customer) {
+                        list += create_row_customer(customer);
+                    });
+                    $("tbody").html(list);
+                });
+            } else {
+                list_customers();
+            }
+        });
+
+    });
+
+
+
+
+
+
+    function get_customers() {
+        let url_php = "../../php/iyr/get_customers.php";
+        return new Promise(function (resolve, reject) {
+            $.ajax({
+                url: url_php,
+                method: "post",
+                dataType: "json",
+                success: function (response) {
+                    resolve(response);
+                },
+                error: function (error) {
+                    reject(error);
+                }
+            });
+        });
+    }
+
+    function create_row_customer(customer) {
+        let customer_state = customer.estado === 1 ? `
+            <option value="1" selected>Activo</option>
+        ` : `
+            <option value="0" selected>Inactivo</option>
+        `;
+        return `
+        <tr>
+            <td>${customer.ci}</td>
+            <td>${customer.nombres}</td>
+            <td>${customer.apellidos}</td>
+            <td>${customer.telefono}</td>
+            <td>${customer.descripcion_direccion}</td>
+            <td>${customer.fecha_hora}</td>
+            <td>${customer.estado}</td>
+        </tr>
+    `;
+    }
+
+    function list_customers() {
+        let list = "";
+        get_customers().then(function (response) {
+            response.forEach(customer => {
+                list += create_row_customer(customer);
+            });
+
+            $("tbody").html(list);
+
+         
+
+            if (tipo_usuario == "Empleado") {
+                $("tbody select").prop('disabled', true);
+                $("tbody button").hide()
+            }
+        }).catch(function (error) { console.log('%c%s', 'color: #fff000', JSON.stringify(error)); });
+    }
+</script>
+
+
+<script>
+    function filtrarTabla() {
+      const selectElement = document.getElementById('estado-select');
+      const estadoSeleccionado = selectElement.value;
+
+      const tabla = document.getElementById('mi-tabla');
+      const filas = tabla.getElementsByTagName('tr');
+
+      for (let i = 1; i < filas.length; i++) {
+        const fila = filas[i];
+        const estado = fila.getElementsByTagName('td')[6].textContent;
+
+        if (estadoSeleccionado === 'todos' || estadoSeleccionado === estado.toLowerCase()) {
+          fila.style.display = '';
+        } else {
+          fila.style.display = 'none';
+        }
+      }
+    }
+  </script>
+  <script>
+    function filtrarTablafecha() {
+      const fechaInicioInput = document.getElementById('fecha-inicio');
+      const fechaFinInput = document.getElementById('fecha-fin');
+
+      const fechaInicio = new Date(fechaInicioInput.value);
+      const fechaFin = new Date(fechaFinInput.value);
+
+      const tabla = document.getElementById('mi-tabla');
+      const filas = tabla.getElementsByTagName('tr');
+
+      for (let i = 1; i < filas.length; i++) {
+        const fila = filas[i];
+        const fechaTexto = fila.getElementsByTagName('td')[5].textContent;
+        const fecha = new Date(fechaTexto);
+
+        if (
+          (!fechaInicioInput.value || fecha >= fechaInicio) &&
+          (!fechaFinInput.value || fecha <= fechaFin)
+        ) {
+          fila.style.display = '';
+        } else {
+          fila.style.display = 'none';
+        }
+      }
+    }
+  </script>
+  
+  
+  
+  
+  
+  
+   <script type="text/javascript">
+        function generate() {
+            var doc = new jsPDF('p', 'pt', 'letter');
+            var htmlstring = '';
+            var tempVarToCheckPageHeight = 0;
+            var pageHeight = 0;
+            pageHeight = doc.internal.pageSize.height;
+            specialElementHandlers = {
+                // element with id of "bypass" - jQuery style selector
+                '#bypassme': function (element, renderer) {
+                    // true = "handled elsewhere, bypass text extraction"
+                    return true
+                }
+            };
+
+            var image = new Image();
+            image.src = 'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcREiyemaD9NX0jyrIh8TIXtMD2lOBgz1NpXSmOi04Yd51c56tn79AyK1AmUPj8T6UgW-30&usqp=CAU';
+            var imageWidth = 100;
+            var imageHeight = 100;
+            var imageX = (doc.internal.pageSize.getWidth() - imageWidth) / 2;
+            var imageY = 20;
+
+            doc.addImage(image, 'JPEG', imageX, imageY, imageWidth, imageHeight);
+
+            margins = {
+                top: 20,
+                bottom: 20,
+                left: 40,
+                right: 40,
+                width: 300
+            };
+            var today = new Date();
+            var now = today.toLocaleString();
+
+            doc.text(50, 150, "Rescatado en: " + now );
+
+            var y = 160;
+            doc.setLineWidth(2);
+            doc.text(200, y = y + 30, "TOTAL DE CLIENTES");
+
+
+
+            doc.autoTable({
+                html: '#mi-tabla',
+                startY: 200,
+                theme: 'grid',
+                columnStyles: {
+                    0: {
+                        cellWidth: 80,
+                    },
+                    1: {
+                        cellWidth: 80,
+                    },
+                    2: {
+                        cellWidth: 80,
+                    },
+                    3: {
+                        cellWidth: 80,
+                    },
+                    4: {
+                        cellWidth: 80,
+                    },
+                    5: {
+                        cellWidth: 80,
+                    },
+                    6: {
+                        cellWidth: 80,
+                    }
+                    
+                },
+                styles: {
+                    minCellHeight: 40
+                }
+            });
+            doc.save('Clientes.pdf');
+        }
+    </script>
+
+</html>
